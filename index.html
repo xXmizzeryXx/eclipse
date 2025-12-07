@@ -1,497 +1,430 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Eclipse Setup - Fluid Onboarding</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-  />
-  <style>
-    /* ====== Reset & Base ====== */
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      background: url('background.jpg') no-repeat center center fixed;
-      background-size: cover;
-      font-family: "Raleway", sans-serif;
-      color: #eee;
-      overflow: hidden;
-      user-select: none;
-    }
-    .app {
-      display: flex;
-      height: 100vh;
-    }
-    nav.sidebar {
-      width: 72px;
-      background: #0f0e0e;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 12px 0;
-      gap: 24px;
-    }
-    nav.sidebar .icon {
-      color: #b88640;
-      font-size: 22px;
-      cursor: pointer;
-      transition: color 0.3s, transform 0.3s;
-    }
-    nav.sidebar .icon:hover {
-      color: #ddb86a;
-      transform: scale(1.2);
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>eclipse.</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<style>
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: url('background.mp4') no-repeat center center fixed;
+    background-size: cover;
+    font-family: 'Raleway', sans-serif;
+    color: #ddd;
+    user-select: none;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Container to hold everything */
+  .app {
+    flex-grow: 1;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  nav.sidebar {
+    width: 72px;
+    background-color: #0f0e0e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 24px;
+  }
+  nav.sidebar .icon {
+    color: #b88640;
+    font-size: 22px;
+    cursor: pointer;
+    transition: color 0.3s ease, transform 0.3s ease;
+  }
+  nav.sidebar .icon:hover {
+    color: #ddb86a;
+    transform: scale(1.25);
+  }
+  nav.sidebar .icon.active {
+    color: #ddb86a;
+  }
+
+  /* Main content area */
+  main.content {
+    flex-grow: 1;
+    padding: 40px 50px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    background: rgba(15,14,14,0.7);
+    overflow-y: auto;
+  }
+
+  /* Header - branding + date/time */
+  header.top-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 48px;
+    align-items: center;
+  }
+  header.top-bar h1.logo {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 48px;
+    color: #eee;
+    margin: 0;
+    user-select: text;
+  }
+  header.top-bar h1.logo .dot {
+    color: #b88640;
+  }
+
+  /* Date/time container */
+  .date-time {
+    display: flex;
+    flex-direction: column;
+    font-family: monospace;
+    font-weight: 500;
+    font-size: 22px;
+    color: #ddd;
+    user-select: text;
+    letter-spacing: 2px;
+  }
+  .date-box {
+    background-color: #1e160b;
+    border: 1.5px solid #b88640;
+    padding: 6px 16px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    width: fit-content;
+    font-weight: 600;
+  }
+  .date-time-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .date-time-line span.prefix {
+    font-weight: 700;
+    color: #b88640;
+    min-width: 14px;
+  }
+  .date-time-line span.time-word {
+    letter-spacing: 4px;
+    color: #ddd;
+  }
+  .date-time-line span.time-word span.highlight {
+    color: #b88640;
+  }
+
+  /* Search bar */
+  .search-bar {
+    display: flex;
+    gap: 12px;
+    max-width: 640px;
+    width: 100%;
+  }
+  .search-bar input[type="text"] {
+    flex-grow: 1;
+    padding: 14px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    font-family: inherit;
+    background: #1e160b;
+    color: #eee;
+    outline-offset: 2px;
+    outline-color: #b88640;
+  }
+  .search-bar input[type="text"]::placeholder {
+    color: #b3a177cc;
+  }
+  .search-bar button {
+    background-color: #b88640;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: #1e160b;
+    transition: background-color 0.3s ease;
+  }
+  .search-bar button:hover {
+    background-color: #ddb86a;
+  }
+
+  /* Quick Access */
+  .quick-access {
+    max-width: 900px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .quick-access a {
+    flex: 1 0 100px;
+    min-width: 100px;
+    max-width: 140px;
+    background: #1e160b;
+    border-radius: 10px;
+    padding: 18px 12px;
+    text-align: center;
+    color: #eee;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 0 15px rgba(184,134,72,0.15);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .quick-access a:hover {
+    background: #b88640;
+    color: #0f0e0e;
+    box-shadow: 0 0 25px #b88640;
+  }
+  .quick-access a i {
+    font-size: 22px;
+    pointer-events: none;
+  }
+
+  /* Info Cards */
+  .info-cards {
+    display: flex;
+    gap: 20px;
+    max-width: 640px;
+    flex-wrap: wrap;
+  }
+  .info-card {
+    background: #1e160b;
+    border-radius: 12px;
+    padding: 18px 24px;
+    box-shadow: 0 0 20px rgba(184,134,72,0.15);
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    min-width: 280px;
+    flex-grow: 1;
+  }
+  .info-card i {
+    font-size: 28px;
+    color: #b88640;
+    margin-top: 2px;
+    min-width: 30px;
+  }
+  .info-text {
+    flex-grow: 1;
+  }
+  .info-text strong {
+    display: block;
+    font-weight: 700;
+    font-size: 17px;
+    margin-bottom: 6px;
+    color: #ddd;
+  }
+  .info-text small {
+    font-size: 13px;
+    color: #bdb1a0;
+  }
+
+  /* Status bar */
+  footer.status-bar {
+    background: #0f0e0e;
+    color: #bdb1a0;
+    padding: 6px 16px;
+    font-family: monospace;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+  }
+  footer.status-bar .status-dot {
+    width: 10px;
+    height: 10px;
+    background: #3c8c2f;
+    border-radius: 50%;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
     main.content {
-      flex: 1;
-      position: relative;
-      padding: 40px 50px;
-      backdrop-filter: blur(4px);
-      overflow-y: auto;
-      user-select: text;
+      padding: 30px 20px;
     }
-    h1.logo {
-      font-family: "Montserrat", sans-serif;
-      font-weight: 700;
-      font-size: 48px;
-      letter-spacing: 2px;
-      color: #eee;
-      margin: 0 0 30px 0;
-    }
-    h1.logo .dot {
-      color: #b88640;
-    }
-    /* ====== Setup Wizard Overlay ====== */
-    .wizard-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 14, 14, 0.95);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      overflow: hidden;
-    }
-    .wizard {
-      width: 480px;
-      max-width: 95vw;
-      background: #1e160b;
-      border-radius: 14px;
-      border: 2px solid #b88640;
-      padding: 40px 48px;
-      box-shadow: 0 0 30px rgba(184, 134, 72, 0.5);
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      user-select: text;
-    }
-    /* Step container for slide animation */
-    .steps-container {
-      position: relative;
-      height: 230px;
-      overflow: hidden;
-    }
-    .step {
-      position: absolute;
-      top: 0;
-      left: 100%;
-      width: 100%;
-      opacity: 0;
-      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      height: 230px;
-    }
-    .step.active {
-      left: 0;
-      opacity: 1;
-      position: relative;
-    }
-    .step.exit-left {
-      left: -100%;
-      opacity: 0;
-    }
-    .step.exit-right {
-      left: 100%;
-      opacity: 0;
-    }
-    /* Titles and text */
-    .step h2 {
-      font-family: "Montserrat", sans-serif;
-      font-size: 28px;
-      margin: 0 0 14px 0;
-      color: #fff;
-      user-select: text;
-    }
-    .step p {
-      font-size: 15px;
-      line-height: 1.5;
-      color: #ccc;
-      margin: 0 0 30px 0;
-      user-select: text;
-    }
-    /* Inputs */
-    .step input[type="text"] {
-      padding: 14px 18px;
-      font-size: 17px;
-      border-radius: 8px;
-      border: none;
-      background: #0f0e0e;
-      color: #eee;
-      outline: none;
-      transition: box-shadow 0.3s;
-      user-select: text;
-      font-family: inherit;
-      width: 100%;
-    }
-    .step input[type="text"]:focus {
-      box-shadow: 0 0 8px #b88640;
-    }
-    /* Background selection */
-    .bg-options {
-      display: flex;
-      gap: 20px;
+    .quick-access {
       justify-content: center;
     }
-    .bg-option {
-      width: 70px;
-      height: 70px;
-      border-radius: 12px;
-      cursor: pointer;
-      border: 3px solid transparent;
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
-      transition: border-color 0.3s, transform 0.3s;
-      flex-shrink: 0;
-      position: relative;
-    }
-    .bg-option.selected {
-      border-color: #b88640;
-      transform: scale(1.1);
-      box-shadow: 0 0 25px #b88640;
-      z-index: 2;
-    }
-    .bg-option[data-color] {
-      background-color: var(--bg-color);
-    }
-    /* sample backgrounds */
-    .bg1 {
-      --bg-color: #2a1a0a;
-      background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=100&q=80');
-      background-size: cover;
-      background-position: center;
-    }
-    .bg2 {
-      --bg-color: #0a1a2a;
-      background-image: url('https://images.unsplash.com/photo-1516116216624-53e697fedbe2?auto=format&fit=crop&w=100&q=80');
-      background-size: cover;
-      background-position: center;
-    }
-    .bg3 {
-      --bg-color: #1a2a0a;
-      background-image: url('https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=100&q=80');
-      background-size: cover;
-      background-position: center;
-    }
-    /* Buttons */
-    .buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 16px;
-    }
-    button {
-      cursor: pointer;
-      background-color: #b88640;
-      color: #0f0e0e;
-      border: none;
-      border-radius: 10px;
-      font-weight: 600;
-      padding: 12px 26px;
-      font-size: 16px;
-      transition: background-color 0.3s ease;
-      user-select: none;
-      min-width: 100px;
-    }
-    button:disabled {
-      background-color: #555;
-      cursor: default;
-    }
-    button:hover:not(:disabled) {
-      background-color: #ddb86a;
-    }
-    /* Step indicator */
-    .step-indicator {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #999;
-      text-align: center;
-      user-select: none;
-      font-family: monospace;
-      letter-spacing: 2px;
-    }
-    /* All set screen styling */
-    .done-icon {
-      font-size: 56px;
-      color: #b88640;
-      margin-bottom: 18px;
-      user-select: none;
-    }
-    /* Responsive */
-    @media (max-width: 520px) {
-      .wizard {
-        padding: 30px 25px;
-      }
-      .step {
-        height: auto;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div class="app" aria-label="Main application">
-    <nav class="sidebar" aria-label="Main sidebar navigation">
-      <div class="icon" onclick="window.location.href='mainhome.html'">
-        <i class="fa-solid fa-desktop"></i>
-      </div>      
-      <div class="icon"><i class="fa-solid fa-globe"></i></div>
-      <div class="icon"><i class="fa-solid fa-moon"></i></div>
-      <div class="icon"><i class="fa-solid fa-gamepad"></i></div>
-      <div class="icon"><i class="fa-solid fa-headphones"></i></div>
-      <div class="icon"><i class="fa-solid fa-file-lines"></i></div>
-      <div class="icon"><i class="fa-solid fa-cog"></i></div>
-    </nav>
-    <main class="content">
-      <h1 class="logo">eclipse<span class="dot">.</span></h1>
-      <p>Welcome to the Eclipse proxy interface.</p>
-    </main>
-  </div>
 
-  <!-- Setup Wizard Overlay -->
-  <div class="wizard-overlay" role="dialog" aria-modal="true" aria-labelledby="wizardTitle" id="wizardOverlay">
-    <div class="wizard" role="document">
-      <div class="steps-container" id="stepsContainer">
-        <!-- Steps injected by JS -->
+<div class="app">
+  <!-- Sidebar -->
+  <nav class="sidebar" aria-label="Main sidebar navigation">
+    <div class="icon" title="Desktop"><i class="fa-solid fa-desktop"></i></div>
+    <div class="icon" title="Browser"><i class="fa-solid fa-globe"></i></div>
+    <div class="icon" title="Dark Mode"><i class="fa-solid fa-moon"></i></div>
+    <div class="icon" title="Games"><i class="fa-solid fa-gamepad"></i></div>
+    <div class="icon" title="Music"><i class="fa-solid fa-headphones"></i></div>
+    <div class="icon" title="Documents"><i class="fa-solid fa-file-lines"></i></div>
+    <div class="icon" title="Settings"><i class="fa-solid fa-cog"></i></div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="content" role="main" aria-label="Main content area">
+
+    <!-- Header -->
+    <header class="top-bar">
+      <h1 class="logo" aria-label="Eclipse branding">
+        eclipse<span class="dot">.</span>
+      </h1>
+
+      <!-- Date/Time -->
+      <div class="date-time" aria-live="polite" aria-atomic="true" role="region" aria-label="Current date and time">
+        <span class="date-box" id="dateBox" aria-label="Current date"></span>
+        <div class="date-time-line">
+          <span class="prefix">T</span>
+          <span class="time-word" id="hourWord"></span>
+        </div>
+        <div class="date-time-line">
+          <span class="prefix">F</span>
+          <span class="time-word" id="minuteWord"></span>
+        </div>
       </div>
-      <div class="buttons">
-        <button id="btnBack" aria-label="Go to previous step">Back</button>
-        <button id="btnNext" aria-label="Go to next step">Next</button>
-      </div>
-      <div class="step-indicator" aria-live="polite" id="stepIndicator"></div>
-    </div>
-  </div>
+    </header>
 
-  <script>
-    (() => {
-      const stepsData = [
-        {
-          title: "Welcome to Eclipse Proxy",
-          text: "Your new proxy experience begins here. Let's get you set up with just a few simple steps.",
-          content: () => {
-            const container = document.createElement('div');
-            container.innerHTML = `
-              <h2 id="wizardTitle">Welcome to Eclipse Proxy</h2>
-              <p>${stepsData[0].text}</p>
-            `;
-            return container;
-          }
-        },
-        {
-          title: "Choose Your Display Name",
-          text: "This name will be shown while using the proxy.",
-          content: () => {
-            const container = document.createElement('div');
-            container.innerHTML = `
-              <h2 id="wizardTitle">${stepsData[1].title}</h2>
-              <p>${stepsData[1].text}</p>
-              <input type="text" id="displayNameInput" placeholder="Enter your display name" autocomplete="off" aria-describedby="nameHelp"/>
-              <small id="nameHelp" style="color:#b88640; margin-top:8px; display:block; font-size:13px;">Use letters, numbers, and spaces only.</small>
-            `;
-            return container;
-          }
-        },
-        {
-          title: "Pick a Background",
-          text: "Choose a background that suits your mood. Preview will update live.",
-          content: () => {
-            const container = document.createElement('div');
-            container.innerHTML = `
-              <h2 id="wizardTitle">${stepsData[2].title}</h2>
-              <p>${stepsData[2].text}</p>
-              <div class="bg-options" role="list" aria-label="Background options">
-                <div tabindex="0" role="listitem" aria-label="Cosmic Brown" class="bg-option bg1" data-bg="url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80')"></div>
-                <div tabindex="0" role="listitem" aria-label="Deep Blue" class="bg-option bg2" data-bg="url('https://images.unsplash.com/photo-1516116216624-53e697fedbe2?auto=format&fit=crop&w=800&q=80')"></div>
-                <div tabindex="0" role="listitem" aria-label="Forest Green" class="bg-option bg3" data-bg="url('https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=800&q=80')"></div>
-              </div>
-            `;
-            return container;
-          }
-        },
-        {
-          title: "All Set!",
-          text: "You're ready to surf through Eclipse Proxy with your custom setup. Enjoy!",
-          content: () => {
-            const container = document.createElement('div');
-            container.innerHTML = `
-              <h2 id="wizardTitle">${stepsData[3].title}</h2>
-              <div class="done-icon"><i class="fa-solid fa-check-circle"></i></div>
-              <p>${stepsData[3].text}</p>
-            `;
-            return container;
-          }
-        }
-      ];
+    <!-- Search -->
+    <form class="search-bar" onsubmit="return false;" role="search" aria-label="Search or browse">
+      <input id="searchInput" type="text" placeholder="Enter URL or search..." aria-label="Search or enter URL" autocomplete="off" />
+      <button type="submit" id="searchBtn">Browse →</button>
+    </form>
 
-      let currentStep = 0;
-      const wizardOverlay = document.getElementById('wizardOverlay');
-      const stepsContainer = document.getElementById('stepsContainer');
-      const btnBack = document.getElementById('btnBack');
-      const btnNext = document.getElementById('btnNext');
-      const stepIndicator = document.getElementById('stepIndicator');
+    <!-- Quick Access -->
+    <section class="quick-access" aria-label="Quick access links">
+      <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+        <i class="fa-brands fa-youtube"></i> YouTube
+      </a>
+      <a href="https://open.spotify.com" target="_blank" rel="noopener noreferrer" aria-label="Spotify">
+        <i class="fa-brands fa-spotify"></i> Spotify
+      </a>
+      <a href="https://discord.com" target="_blank" rel="noopener noreferrer" aria-label="Discord">
+        <i class="fa-brands fa-discord"></i> Discord
+      </a>
+      <a href="https://www.twitch.tv" target="_blank" rel="noopener noreferrer" aria-label="Twitch">
+        <i class="fa-brands fa-twitch"></i> Twitch
+      </a>
+      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+        <i class="fa-brands fa-twitter"></i> Twitter
+      </a>
+      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <i class="fa-brands fa-instagram"></i> Instagram
+      </a>
+      <a href="https://netflix.com" target="_blank" rel="noopener noreferrer" aria-label="Netflix">
+        <i class="fa-solid fa-film"></i> Netflix
+      </a>
+      <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+        <i class="fa-brands fa-github"></i> GitHub
+      </a>
+    </section>
 
-      let displayName = "";
-      let selectedBackground = "";
+    <!-- Info cards -->
+    <section class="info-cards" aria-label="Information cards">
+      <article class="info-card" tabindex="0">
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        <div class="info-text">
+          <strong>Encrypted Connection</strong>
+          <small>All traffic is encrypted and routed through secure servers</small>
+        </div>
+      </article>
+      <article class="info-card" tabindex="0">
+        <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+        <div class="info-text">
+          <strong>Lightning Fast</strong>
+          <small>Optimized for speed with minimal latency overhead</small>
+        </div>
+      </article>
+    </section>
 
-      function renderStep(next = true) {
-        // Clear previous content
-        stepsContainer.innerHTML = '';
+  </main>
+</div>
 
-        // Create step element with content
-        const stepElem = stepsData[currentStep].content();
+<!-- Status bar -->
+<footer class="status-bar" aria-label="Status bar">
+  <span class="status-dot" aria-hidden="true"></span>
+  <span>Connected</span>
+  <span>•</span>
+  <span>100%</span>
+</footer>
 
-        // Add class for animation direction
-        stepElem.classList.add('step', 'active');
+<script>
+  // Clock number to words conversion - stylized to match the original
+  const ones = ["ZERO","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE"];
+  const teens = ["TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN"];
+  const tens = ["","","TWENTY","THIRTY","FORTY","FIFTY"];
 
-        stepsContainer.appendChild(stepElem);
+  function numberToWords(num){
+    if(num<10) return ones[num];
+    if(num<20) return teens[num-10];
+    let t = Math.floor(num/10);
+    let o = num%10;
+    return tens[t]+(o>0?" "+ones[o]:"");
+  }
 
-        // Set buttons states
-        btnBack.disabled = currentStep === 0;
-        btnNext.textContent = currentStep === stepsData.length - 1 ? 'Finish' : 'Next';
+  function styledNumber(num){
+    const word = numberToWords(num);
+    const numStr = num.toString().padStart(2,"0");
+    const firstLetter = word[0];
+    const rest = word.substring(1);
+    return `${firstLetter}<span class="highlight">${numStr}</span>${rest}`;
+  }
 
-        // Update step indicator
-        stepIndicator.textContent = `Step ${currentStep + 1} / ${stepsData.length}`;
+  function updateDateTime(){
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.toLocaleString("en-US",{month:"short"});
+    const hour = now.getHours();
+    const minute = now.getMinutes();
 
-        // Focus first input if present
-        const firstInput = stepElem.querySelector('input, [tabindex]');
-        if (firstInput) firstInput.focus();
+    document.getElementById('dateBox').textContent = (day<10 ? '0'+day : day) + " " + month;
+    document.getElementById('hourWord').innerHTML = styledNumber(hour);
+    document.getElementById('minuteWord').innerHTML = styledNumber(minute);
+  }
 
-        // Restore saved values if returning to a step
-        if (currentStep === 1 && displayName) {
-          const input = document.getElementById('displayNameInput');
-          if (input) input.value = displayName;
-        }
-        if (currentStep === 2 && selectedBackground) {
-          const bgOptions = stepElem.querySelectorAll('.bg-option');
-          bgOptions.forEach(opt => {
-            if (opt.dataset.bg === selectedBackground) {
-              opt.classList.add('selected');
-            }
-          });
-        }
+  updateDateTime();
+  setInterval(updateDateTime, 60000);
+
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+
+  function performSearch(){
+    let query = searchInput.value.trim();
+    if(!query) return;
+    // If input looks like URL (starts with http or www), open as URL, else search with Google
+    if(query.match(/^(https?:\/\/|www\.)/i)){
+      if(!query.match(/^https?:\/\//i)){
+        query = 'https://' + query;
       }
+      window.open(query, '_blank');
+    } else {
+      const searchURL = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+      window.open(searchURL, '_blank');
+    }
+  }
 
-      function validateStep() {
-        if (currentStep === 1) {
-          const input = document.getElementById('displayNameInput');
-          if (!input.value.trim()) return false;
-          // Allow letters, numbers, spaces only:
-          if (!/^[a-zA-Z0-9 ]+$/.test(input.value.trim())) return false;
-        }
-        if (currentStep === 2) {
-          if (!selectedBackground) return false;
-        }
-        return true;
-      }
-
-      btnBack.addEventListener('click', () => {
-        if (currentStep === 0) return;
-        currentStep--;
-        renderStep(false);
-      });
-
-      btnNext.addEventListener('click', () => {
-        if (!validateStep()) {
-          alert('Please complete the required fields with valid input before continuing.');
-          return;
-        }
-
-        // Save inputs
-        if (currentStep === 1) {
-          const input = document.getElementById('displayNameInput');
-          displayName = input.value.trim();
-        }
-
-        currentStep++;
-
-        if (currentStep === 3) {
-          // On all set screen — save settings and close wizard after short delay
-          saveSettings();
-          renderStep();
-          setTimeout(() => {
-            wizardOverlay.style.display = 'none';
-            applyBackground();
-          }, 1800);
-          return;
-        }
-        renderStep();
-      });
-
-      // Background selection
-      document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('bg-option')) {
-          const stepElem = stepsContainer.querySelector('.step');
-          const bgOptions = stepElem.querySelectorAll('.bg-option');
-          bgOptions.forEach(opt => opt.classList.remove('selected'));
-          e.target.classList.add('selected');
-          selectedBackground = e.target.dataset.bg;
-          applyBackground(selectedBackground);
-        }
-      });
-
-      // Keyboard accessibility for background options
-      document.addEventListener('keydown', (e) => {
-        if (e.target.classList.contains('bg-option')) {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            e.target.click();
-          }
-        }
-      });
-
-      function saveSettings() {
-        const config = {
-          name: displayName,
-          background: selectedBackground || ''
-        };
-        localStorage.setItem('eclipseProxySetup', JSON.stringify(config));
-        console.log("Settings saved:", config);
-      }
-
-      function applyBackground(bgUrl) {
-        const url = bgUrl || selectedBackground || '';
-        if (url) {
-          document.body.style.backgroundImage = url;
-        }
-      }
-
-      // On load
-      window.addEventListener('DOMContentLoaded', () => {
-        const saved = localStorage.getItem('eclipseProxySetup');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          displayName = parsed.name || "";
-          selectedBackground = parsed.background || "";
-          wizardOverlay.style.display = 'none';
-          applyBackground(selectedBackground);
-        } else {
-          renderStep();
-        }
-      });
-    })();
-  </script>
+  searchBtn.addEventListener('click', performSearch);
+  searchInput.addEventListener('keydown', e => {
+    if(e.key === 'Enter'){
+      performSearch();
+    }
+  });
+</script>
 </body>
 </html>

@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>eclipse.</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico" />
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <style>
@@ -13,14 +14,24 @@
   }
   body {
     margin: 0;
-    background: url('background.mp4') no-repeat center center fixed;
-    background-size: cover;
     font-family: 'Raleway', sans-serif;
     color: #ddd;
     user-select: none;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Video background */
+  #videoBG {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
   }
 
   /* Container to hold everything */
@@ -264,6 +275,11 @@
 </style>
 </head>
 <body>
+
+<!-- Video Background -->
+<video id="videoBG" autoplay muted loop playsinline>
+  <source src="background.mp4" type="video/mp4">
+</video>
 
 <div class="app">
   <!-- Sidebar -->

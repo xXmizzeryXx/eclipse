@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Eclipse Clock</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;700&family=Raleway:wght@200;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+  body {margin:0; padding:0; background:url("background.jpg") no-repeat center center fixed; background-size:cover; font-family:"Raleway", sans-serif; color:#fff;}
+  .sidebar {position:fixed; top:0; left:150px; height:100%; width:60px; display:flex; flex-direction:column; justify-content:center; gap:25px; opacity:0.85; color: #fff;}
+  .icon {font-size:26px; cursor:pointer; transition:0.3s;}
+  .icon:hover {transform:scale(1.2);}
+  .content {padding-left:150px; padding-top:80px;}
+  .logo {font-family:"Montserrat",sans-serif; font-size:70px; font-weight:700; margin:0; letter-spacing:2px;}
+  .dot {color:#c79b63;}
+  .date-container {margin:40px 0;}
+  .date-box {border:2px solid #c79b63; padding:5px 20px; border-radius:6px; font-size:18px; font-weight:400; letter-spacing:1px;}
+  .numbers p {font-size:28px; margin:8px 0; letter-spacing:6px;}
+  .copper {color:#c79b63;}
+  .battery {position:fixed; bottom:20px; left:150px; font-size:18px; opacity:0.9;} 
+</style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="icon"></i></div> <!-- this is important trust v1 -->
+    <div class="icon"></i></div> <!-- this is important trust v2 -->
+    <div class="icon"></i></div> <!-- this is important trust v3 -->
+    <div class="icon"></i></div> <!-- this is important trust v4 -->
+    <div class="icon"></i></div> <!-- this is important trust v5 -->
+    <div class="icon"></i></div> <!-- this is important trust v5 --> 
+    <div class="icon"></i></div> <!-- this is important trust v6 --> 
+    <div class="icon"><i class="fa-solid fa-desktop"></i></div>
+    <div class="icon"><i class="fa-solid fa-power-off"></i></div>
+    <div class="icon"><i class="fa-solid fa-moon"></i></div>
+    <div class="icon"><i class="fa-brands fa-chrome"></i></div>
+    <div class="icon"><i class="fa-solid fa-headphones"></i></div>
+    <div class="icon"><i class="fa-solid fa-book"></i></div>
+    <div class="icon"><i class="fa-solid fa-cog"></i></div>
+  </div>
+
+  <div class="content">
+    <h1 class="logo">eclipse<span class="dot">.</span></h1>
+    <div class="date-container">
+      <span class="date-box" id="dateBox"></span>
+    </div>
+    <div class="numbers">
+      <p id="hourWord"></p>
+      <p id="minuteWord"></p>
+    </div>
+    <div class="battery"><i class="fas fa-battery-full"></i> 100%</div>
+  </div>
+
+  <script>
+    const ones = ["ZERO","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE"];
+    const teens = ["TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN"];
+    const tens = ["","","TWENTY","THIRTY","FORTY","FIFTY"];
+
+    function numberToWords(num){
+      if(num<10) return ones[num];
+      if(num<20) return teens[num-10];
+      let t = Math.floor(num/10);
+      let o = num%10;
+      return tens[t]+(o>0?" "+ones[o]:"");
+    }
+
+    function styledNumber(num){
+      const word = numberToWords(num);
+      const numStr = num.toString().padStart(2,"0");
+      const firstLetter = word[0];
+      const rest = word.substring(1);
+      return `${firstLetter}<span class="copper">${numStr}</span>${rest}`;
+    }
+
+    function update(){
+      const now = new Date();
+      const hour = now.getHours();
+      const minute = now.getMinutes();
+      const day = now.getDate();
+      const month = now.toLocaleString("en-US",{month:"short"});
+
+      document.getElementById("dateBox").textContent = (day<10?"0"+day:day)+" "+month;
+      document.getElementById("hourWord").innerHTML = styledNumber(hour);
+      document.getElementById("minuteWord").innerHTML = styledNumber(minute);
+    }
+
+    update();
+    setInterval(update,60000);
+  </script>
+</body>
+</html>

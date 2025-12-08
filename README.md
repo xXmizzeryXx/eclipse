@@ -7,19 +7,19 @@ A sleek, modern web proxy with a beautiful interface designed for unblocked brow
 
 ## ✨ Features
 
-- **🎨 Modern UI**: Clean, professional interface with custom video background
-- **⚡ Fast & Efficient**: Optimized for speed with minimal latency
-- **🔒 Secure**: Encrypted connections through secure proxy servers
-- **📱 Responsive**: Works seamlessly on desktop and mobile devices
-- **🎯 Quick Access**: One-click shortcuts to popular websites
-- **🕐 Live Clock**: Real-time date and time display with unique styling
+- **🎨 Modern UI**: *Clean, professional interface with custom video background*
+- **⚡ Fast & Efficient**: *Optimized for speed with minimal latency*
+- **🔒 Secure**: *Encrypted connections through secure proxy servers*
+- **📱 Responsive**: *Works seamlessly on desktop and mobile devices*
+- **🎯 Quick Access**: *One-click shortcuts to popular websites*
+- **🕐 Live Clock**: *Real-time date and time display with unique styling*
 
 ## 🎮 Usage
 
-1. **Browse Websites**: Enter any URL or search term in the search bar
-2. **Quick Access**: Click on any of the quick access buttons for instant navigation
-3. **Navigation**: Use the sidebar icons to access different features
-4. **Credits**: Click the book icon to view project credits
+1. **Browse Websites**: *Enter any URL or search term in the search bar*
+2. **Quick Access**: *Click on any of the quick access buttons for instant navigation*
+3. **Navigation**: *Use the sidebar icons to access different features*
+4. **Credits**: *Click the book icon to view project credits*
 
 ## 🛠️ Project Structure
 

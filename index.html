@@ -751,7 +751,7 @@
   <nav class="sidebar" aria-label="Main sidebar navigation">
     <div class="icon active" title="Home" onclick="window.location.href='index.html'"><i class="fa-solid fa-house"></i></div>
     <div class="icon" title="Browser" onclick="window.location.href='frame.html'"><i class="fa-solid fa-globe"></i></div>
-    <div class="icon" title="Dark Mode"><i class="fa-solid fa-moon"></i></div>
+    <div class="icon" title="Emergency Cloaking" id="randomCloakBtn"><i class="fa-solid fa-moon"></i></div>
     <div class="icon" title="Games" onclick="window.location.href='games.html'"><i class="fa-solid fa-gamepad"></i></div>
     <div class="icon" title="Music"><i class="fa-solid fa-headphones"></i></div>
     <div class="icon" title="Credits" onclick="window.location.href='credits.html'"><i class="fa-solid fa-book"></i></div>
@@ -904,6 +904,35 @@
   const originalTitle = document.title;
   const originalFavicon = document.querySelector('link[rel="icon"]').href;
 
+  // Random cloak presets
+  const cloakPresets = [
+    { title: "Google", favicon: "https://www.google.com/favicon.ico" },
+    { title: "Google Docs", favicon: "https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" },
+    { title: "Google Classroom", favicon: "https://ssl.gstatic.com/classroom/favicon.png" },
+    { title: "Canvas", favicon: "https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico" },
+    { title: "Gmail", favicon: "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico" },
+    { title: "Google Drive", favicon: "https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png" },
+    { title: "Google Slides", favicon: "https://ssl.gstatic.com/docs/presentations/images/favicon5.ico" },
+    { title: "Google Sheets", favicon: "https://ssl.gstatic.com/docs/spreadsheets/favicon3.ico" },
+    { title: "YouTube", favicon: "https://www.youtube.com/s/desktop/6e6c14c5/img/favicon_32x32.png" },
+    { title: "Wikipedia", favicon: "https://www.wikipedia.org/static/favicon/wikipedia.ico" }
+  ];
+
+  // Random cloak button in sidebar
+  document.getElementById('randomCloakBtn').addEventListener('click', () => {
+    const randomPreset = cloakPresets[Math.floor(Math.random() * cloakPresets.length)];
+    document.title = randomPreset.title;
+    document.querySelector('link[rel="icon"]').href = randomPreset.favicon;
+    localStorage.setItem('cloakTitle', randomPreset.title);
+    localStorage.setItem('cloakFavicon', randomPreset.favicon);
+    
+    // Update inputs if they exist
+    if(document.getElementById('cloakTitle')) {
+      document.getElementById('cloakTitle').value = randomPreset.title;
+      document.getElementById('cloakFavicon').value = randomPreset.favicon;
+    }
+  });
+
   document.getElementById('applyCloakBtn').addEventListener('click', () => {
     const title = document.getElementById('cloakTitle').value.trim();
     const favicon = document.getElementById('cloakFavicon').value.trim();
@@ -946,11 +975,15 @@
   const savedFavicon = localStorage.getItem('cloakFavicon');
   if(savedTitle) {
     document.title = savedTitle;
-    document.getElementById('cloakTitle').value = savedTitle;
+    if(document.getElementById('cloakTitle')) {
+      document.getElementById('cloakTitle').value = savedTitle;
+    }
   }
   if(savedFavicon) {
     document.querySelector('link[rel="icon"]').href = savedFavicon;
-    document.getElementById('cloakFavicon').value = savedFavicon;
+    if(document.getElementById('cloakFavicon')) {
+      document.getElementById('cloakFavicon').value = savedFavicon;
+    }
   }
 
   // ===== BOOKMARKS =====

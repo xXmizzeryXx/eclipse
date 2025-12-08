@@ -59,28 +59,28 @@
 
     <!-- Quick Access -->
     <section class="quick-access" aria-label="Quick access links">
-      <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+      <a href="#" data-url="https://www.youtube.com" class="proxy-link" aria-label="YouTube">
         <i class="fa-brands fa-youtube"></i> YouTube
       </a>
-      <a href="https://open.spotify.com" target="_blank" rel="noopener noreferrer" aria-label="Spotify">
+      <a href="#" data-url="https://open.spotify.com" class="proxy-link" aria-label="Spotify">
         <i class="fa-brands fa-spotify"></i> Spotify
       </a>
-      <a href="https://discord.com" target="_blank" rel="noopener noreferrer" aria-label="Discord">
+      <a href="#" data-url="https://discord.com" class="proxy-link" aria-label="Discord">
         <i class="fa-brands fa-discord"></i> Discord
       </a>
-      <a href="https://www.twitch.tv" target="_blank" rel="noopener noreferrer" aria-label="Twitch">
+      <a href="#" data-url="https://www.twitch.tv" class="proxy-link" aria-label="Twitch">
         <i class="fa-brands fa-twitch"></i> Twitch
       </a>
-      <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+      <a href="#" data-url="https://twitter.com" class="proxy-link" aria-label="Twitter">
         <i class="fa-brands fa-twitter"></i> Twitter
       </a>
-      <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+      <a href="#" data-url="https://instagram.com" class="proxy-link" aria-label="Instagram">
         <i class="fa-brands fa-instagram"></i> Instagram
       </a>
-      <a href="https://netflix.com" target="_blank" rel="noopener noreferrer" aria-label="Netflix">
+      <a href="#" data-url="https://netflix.com" class="proxy-link" aria-label="Netflix">
         <i class="fa-solid fa-film"></i> Netflix
       </a>
-      <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+      <a href="#" data-url="https://github.com" class="proxy-link" aria-label="GitHub">
         <i class="fa-brands fa-github"></i> GitHub
       </a>
     </section>
@@ -151,23 +151,17 @@
   updateDateTime();
   setInterval(updateDateTime, 60000);
 
-  // Search functionality
+  // Search functionality - redirect to frame.html
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
 
   function performSearch(){
     let query = searchInput.value.trim();
     if(!query) return;
-    // If input looks like URL (starts with http or www), open as URL, else search with Google
-    if(query.match(/^(https?:\/\/|www\.)/i)){
-      if(!query.match(/^https?:\/\//i)){
-        query = 'https://' + query;
-      }
-      window.open(query, '_blank');
-    } else {
-      const searchURL = 'https://www.google.com/search?q=' + encodeURIComponent(query);
-      window.open(searchURL, '_blank');
-    }
+    
+    // Build the frame.html URL with encoded query
+    const frameURL = 'frame.html?q=' + encodeURIComponent(query);
+    window.location.href = frameURL;
   }
 
   searchBtn.addEventListener('click', performSearch);
@@ -175,6 +169,16 @@
     if(e.key === 'Enter'){
       performSearch();
     }
+  });
+
+  // Quick access links - redirect through frame.html
+  document.querySelectorAll('.proxy-link').forEach(link => {
+    link.addEventListener('click', function(e){
+      e.preventDefault();
+      const url = this.getAttribute('data-url');
+      const frameURL = 'frame.html?q=' + encodeURIComponent(url);
+      window.location.href = frameURL;
+    });
   });
 </script>
 </body>

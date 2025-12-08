@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>eclipse.</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+<style>
+  /* Override for frame layout */
+  body {
+    overflow: hidden;
+  }
+
+  .app {
+    height: 100vh;
+  }
+
+  main.content {
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header.top-bar {
+    background: rgba(15, 14, 14, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    border-bottom: 1px solid rgba(184, 134, 72, 0.2);
+    gap: 20px;
+    flex-shrink: 0;
+  }
+
+  header.top-bar h1.logo {
+    font-size: 32px;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  /* Browser controls */
+  .browser-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    max-width: 800px;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .nav-btn {
+    background: #1e160b;
+    border: 1px solid #b88640;
+    color: #b88640;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 14px;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    background: #b88640;
+    color: #1e160b;
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .address-bar {
+    flex: 1;
+    background: #1e160b;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    color: #eee;
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    outline-offset: 2px;
+    outline-color: #b88640;
+  }
+
+  .address-bar::placeholder {
+    color: #b3a177cc;
+  }
+
+  .reload-btn {
+    background: #b88640;
+    border: none;
+    color: #1e160b;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reload-btn:hover {
+    background: #ddb86a;
+  }
+
+  /* Date/time adjustments for smaller header */
+  header.top-bar .date-time {
+    font-size: 16px;
+  }
+
+  header.top-bar .date-box {
+    padding: 4px 12px;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+
+  header.top-bar .date-time-line {
+    gap: 8px;
+  }
+
+  header.top-bar .date-time-line span.time-word {
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+
+  /* Browser iframe */
+  #browserFrame {
+    width: 100%;
+    flex: 1;
+    border: none;
+    background: #000;
+    display: block;
+  }
+
+  /* Frame container */
+  .frame-container {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+</style>
+</head>
+<body>
+
+<!-- Video Background -->
+<video id="videoBG" autoplay muted loop playsinline>
+  <source src="assets/bg/background.mp4" type="video/mp4">
+</video>
+
+<div class="app">
+  <!-- Sidebar -->
+  <nav class="sidebar" aria-label="Main sidebar navigation">
+    <div class="icon" title="Home" onclick="window.location.href='index.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="icon active" title="Browser"><i class="fa-solid fa-globe"></i></div>
+    <div class="icon" title="Dark Mode"><i class="fa-solid fa-moon"></i></div>
+    <div class="icon" title="Games"><i class="fa-solid fa-gamepad"></i></div>
+    <div class="icon" title="Music"><i class="fa-solid fa-headphones"></i></div>
+    <div class="icon" title="Credits" onclick="window.location.href='credits.html'"><i class="fa-solid fa-book"></i></div>
+    <div class="icon" title="Settings"><i class="fa-solid fa-cog"></i></div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="content" role="main" aria-label="Main content area">
+    
+    <!-- Browser Header -->
+    <header class="top-bar">
+      <h1 class="logo" aria-label="Eclipse branding" onclick="window.location.href='index.html'">
+        eclipse<span class="dot">.</span>
+      </h1>
+
+      <div class="browser-controls">
+        <div class="nav-buttons">
+          <button class="nav-btn" id="backBtn" title="Back" disabled>
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <button class="nav-btn" id="forwardBtn" title="Forward" disabled>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+        
+        <input type="text" class="address-bar" id="addressBar" placeholder="Enter URL or search..." />
+        
+        <button class="reload-btn" id="reloadBtn">
+          <i class="fa-solid fa-rotate-right"></i> Reload
+        </button>
+      </div>
+
+      <!-- Date/Time -->
+      <div class="date-time" aria-live="polite" aria-atomic="true" role="region" aria-label="Current date and time">
+        <span class="date-box" id="dateBox" aria-label="Current date"></span>
+        <div class="date-time-line">
+          <span class="prefix">T</span>
+          <span class="time-word" id="hourWord"></span>
+        </div>
+        <div class="date-time-line">
+          <span class="prefix">F</span>
+          <span class="time-word" id="minuteWord"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Browser Frame -->
+    <div class="frame-container">
+      <iframe id="browserFrame"></iframe>
+    </div>
+
+  </main>
+</div>
+
+<!-- Status bar -->
+<footer class="status-bar" aria-label="Status bar">
+  <span class="status-dot" aria-hidden="true"></span>
+  <span>Connected</span>
+  <span>•</span>
+  <span id="statusText">Ready</span>
+</footer>
+
+<script>
+  // Clock functionality
+  const ones = ["ZERO","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE"];
+  const teens = ["TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN"];
+  const tens = ["","","TWENTY","THIRTY","FORTY","FIFTY"];
+
+  function numberToWords(num){
+    if(num<10) return ones[num];
+    if(num<20) return teens[num-10];
+    let t = Math.floor(num/10);
+    let o = num%10;
+    return tens[t]+(o>0?" "+ones[o]:"");
+  }
+
+  function styledNumber(num){
+    const word = numberToWords(num);
+    const numStr = num.toString().padStart(2,"0");
+    const firstLetter = word[0];
+    const rest = word.substring(1);
+    return `${firstLetter}<span class="highlight">${numStr}</span>${rest}`;
+  }
+
+  function updateDateTime(){
+    const now = new Date();
+    const day = now.getDate();
+    const month = now.toLocaleString("en-US",{month:"short"});
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+
+    document.getElementById('dateBox').textContent = (day<10 ? '0'+day : day) + " " + month;
+    document.getElementById('hourWord').innerHTML = styledNumber(hour);
+    document.getElementById('minuteWord').innerHTML = styledNumber(minute);
+  }
+
+  updateDateTime();
+  setInterval(updateDateTime, 60000);
+
+  // Browser functionality
+  const params = new URLSearchParams(window.location.search);
+  const query = params.get('q');
+  const browserFrame = document.getElementById('browserFrame');
+  const addressBar = document.getElementById('addressBar');
+  const reloadBtn = document.getElementById('reloadBtn');
+  const backBtn = document.getElementById('backBtn');
+  const forwardBtn = document.getElementById('forwardBtn');
+  const statusText = document.getElementById('statusText');
+
+  let currentURL = '';
+
+  function loadURL(url) {
+    if (!url) return;
+    
+    currentURL = url;
+    addressBar.value = url;
+    
+    // Build searcher.html URL with all parameters
+    const searcherURL = 'searcher.html?q=' + encodeURIComponent(url) + '&backend=ultraviolet&wisp=wss://wisp.mercurywork.shop/';
+    browserFrame.src = searcherURL;
+    
+    statusText.textContent = 'Loading...';
+  }
+
+  // Initialize with query parameter
+  if (query) {
+    loadURL(query);
+  }
+
+  // Address bar functionality
+  addressBar.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const newURL = addressBar.value.trim();
+      if (newURL) {
+        // Update URL and reload frame
+        const newFrameURL = 'frame.html?q=' + encodeURIComponent(newURL);
+        window.location.href = newFrameURL;
+      }
+    }
+  });
+
+  // Reload button
+  reloadBtn.addEventListener('click', function() {
+    if (currentURL) {
+      loadURL(currentURL);
+    } else {
+      browserFrame.src = browserFrame.src;
+    }
+  });
+
+  // Back button
+  backBtn.addEventListener('click', function() {
+    window.history.back();
+  });
+
+  // Forward button
+  forwardBtn.addEventListener('click', function() {
+    window.history.forward();
+  });
+
+  // Update status when frame loads
+  browserFrame.addEventListener('load', function() {
+    statusText.textContent = 'Ready';
+  });
+
+  // Enable back/forward buttons based on history
+  if (window.history.length > 1) {
+    backBtn.disabled = false;
+  }
+</script>
+</body>
+</html>

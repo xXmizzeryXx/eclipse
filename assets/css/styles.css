@@ -253,6 +253,94 @@ footer.status-bar .status-dot {
   border-radius: 50%;
 }
 
+/* Credits Page Styles */
+.credits-section {
+  max-width: 900px;
+  width: 100%;
+}
+
+.credits-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: #eee;
+  margin: 0 0 12px 0;
+}
+
+.credits-subtitle {
+  font-size: 18px;
+  color: #bdb1a0;
+  margin: 0 0 40px 0;
+}
+
+.credits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.credit-card {
+  background: #1e160b;
+  border-radius: 12px;
+  padding: 32px 28px;
+  box-shadow: 0 0 20px rgba(184,134,72,0.15);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.credit-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 30px rgba(184,134,72,0.3);
+}
+
+.credit-icon {
+  font-size: 48px;
+  color: #b88640;
+  margin-bottom: 20px;
+}
+
+.credit-role {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #ddd;
+  margin: 0 0 20px 0;
+  border-bottom: 2px solid #b88640;
+  padding-bottom: 12px;
+}
+
+.credit-names {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.credit-name {
+  font-size: 18px;
+  color: #eee;
+  font-weight: 600;
+  padding: 10px 16px;
+  background: rgba(184,134,72,0.1);
+  border-radius: 6px;
+  border-left: 3px solid #b88640;
+}
+
+.credits-footer {
+  text-align: center;
+  padding: 24px;
+  background: #1e160b;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.credits-footer p {
+  margin: 0;
+  font-size: 16px;
+  color: #bdb1a0;
+  font-style: italic;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   main.content {
@@ -260,5 +348,8 @@ footer.status-bar .status-dot {
   }
   .quick-access {
     justify-content: center;
+  }
+  .credits-grid {
+    grid-template-columns: 1fr;
   }
 }

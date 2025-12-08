@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>eclipse. - games</title>
+<title>games - eclipse.</title>
 <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.png" />
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -291,7 +291,7 @@
       noResults.style.display = 'none';
       
       grid.innerHTML = filtered.map(game => `
-        <a href="${game.path}" class="game-card">
+        <a href="game-modal.html?path=${encodeURIComponent(game.path)}&name=${encodeURIComponent(game.name)}&description=${encodeURIComponent(game.description)}" class="game-card">
           <div class="game-info">
             <h3 class="game-title">${game.name}</h3>
             <div class="game-category">${game.category}</div>

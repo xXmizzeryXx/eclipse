@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Play - eclipse.</title>
+  <link rel="icon" type="image/x-icon" href="assets/favicon/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <style>
+    :root{--bg:#0f0e0e;--card:#1e160b;--accent:#b88640;--muted:#bdb1a0}
+    body{background:var(--bg);color:#eee;font-family:Raleway,system-ui,Segoe UI,Roboto,Arial;margin:0}
+    .player-app{display:flex;gap:20px;padding:28px;min-height:100vh;box-sizing:border-box}
+    .player-wrap{flex:1;background:transparent;display:flex;flex-direction:column;gap:12px}
+    .player-header{display:flex;align-items:center;justify-content:space-between}
+    .player-title{font-family:Montserrat,Arial;font-size:20px;margin:0;color:#fff}
+    .player-desc{color:var(--muted);margin:0;font-size:14px}
+    .player-frame{flex:1;border-radius:12px;overflow:hidden;background:#000;border:2px solid rgba(255,255,255,0.03)}
+    .player-frame iframe{width:100%;height:100%;border:0;display:block}
+    .sidebar{width:320px;background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 24px rgba(0,0,0,0.4)}
+    .sidebar h4{margin:0 0 12px 0;font-size:14px;color:var(--accent);text-transform:uppercase}
+    .game-list{display:flex;flex-direction:column;gap:10px;overflow:auto;max-height:calc(100vh - 120px);padding-right:6px}
+    .side-item{display:flex;flex-direction:column;padding:10px;border-radius:8px;background:rgba(0,0,0,0.05);cursor:pointer;color:#eee;text-decoration:none}
+    .side-item.active{background:var(--accent);color:var(--bg)}
+    .side-item .name{font-weight:700;font-size:14px}
+    .side-item .cat{font-size:11px;color:var(--muted);text-transform:uppercase}
+    .controls{display:flex;gap:8px;align-items:center}
+    .btn{background:transparent;border:2px solid var(--accent);color:var(--accent);padding:6px 10px;border-radius:8px;cursor:pointer}
+    .btn.primary{background:var(--accent);color:var(--bg)}
+    @media(max-width:900px){.player-app{flex-direction:column}.sidebar{width:100%;order:2}}
+  </style>
+</head>
+<body>
+
+<div class="player-app">
+  <div class="player-wrap">
+    <div class="player-header">
+      <div>
+        <h2 class="player-title" id="title">Loading...</h2>
+        <p class="player-desc" id="description"></p>
+      </div>
+      <div class="controls">
+        <button class="btn" id="backBtn"><i class="fa-solid fa-arrow-left"></i>&nbsp;Back</button>
+        <a id="openRawBtn" class="btn" target="_blank">Open Raw</a>
+      </div>
+    </div>
+
+    <div class="player-frame" id="frameWrap">
+      <iframe id="gameFrame" src="about:blank" title="Game player" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock"></iframe>
+    </div>
+  </div>
+
+  <aside class="sidebar" aria-label="Other games list">
+    <h4>Other Games</h4>
+    <div class="game-list" id="gameList"></div>
+  </aside>
+
+</div>
+
+<script>
+  // Games list (kept in sync with games.html)
+  const games = [
+    { name: "Time Shooter 2", category: "action", path: "games/timeshooter2.html", description: "Time moves only when you move." },
+    { name: "Slope", category: "arcade", path: "games/slope.html", description: "Don't let the ball crash." },
+    { name: "Tomb of the Mask", category: "puzzle", path: "games/tomb-of-the-mask.html", description: "Get the yellow guy through the levels." },
+    { name: "Task Force: Eclipse", category: "strategy", path: "games/eclipse.html", description: "Strategic shooter and tactics." },
+    { name: "Retro Bowl", category: "sports", path: "games/retro-bowl/index.html", description: "Football like the 80's." },
+    { name: "Madalin Stunt Cars 3", category: "racing", path: "games/madalin-stunt-cars-3/index.html", description: "Do stunts in a cool car." },
+    { name: "Basket Random", category: "sports", path: "games/basket-random/index.html", description: "Ragdoll basketball fun." }
+  ];
+
+  const params = new URLSearchParams(location.search);
+  const initialPath = params.get('path') || games[0].path;
+  const initialName = params.get('name') || '';
+  const initialDescription = params.get('description') || '';
+
+  const titleEl = document.getElementById('title');
+  const descEl = document.getElementById('description');
+  const frame = document.getElementById('gameFrame');
+  const listEl = document.getElementById('gameList');
+  const openRawBtn = document.getElementById('openRawBtn');
+
+  function setGame(path, name, description, push=true){
+    titleEl.textContent = name || decodeURIComponent(path.split('/').pop());
+    descEl.textContent = description || '';
+    frame.src = path;
+    openRawBtn.href = path;
+    // update active in list
+    document.querySelectorAll('.side-item').forEach(el => el.classList.remove('active'));
+    const items = Array.from(document.querySelectorAll('.side-item'));
+    const active = items.find(i => i.getAttribute('data-path') === path);
+    if(active) active.classList.add('active');
+    if(push){
+      const url = `?path=${encodeURIComponent(path)}&name=${encodeURIComponent(name||'')}&description=${encodeURIComponent(description||'')}`;
+      history.replaceState({}, '', url);
+    }
+  }
+
+  function buildList(){
+    listEl.innerHTML = '';
+    games.forEach(g => {
+      const a = document.createElement('a');
+      a.className = 'side-item';
+      a.href = '#';
+      a.setAttribute('data-path', g.path);
+      a.innerHTML = `<div class="name">${g.name}</div><div class="cat">${g.category}</div>`;
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        setGame(g.path, g.name, g.description, true);
+      });
+      listEl.appendChild(a);
+    });
+  }
+
+  document.getElementById('backBtn').addEventListener('click', ()=>{ location.href = 'games.html'; });
+
+  buildList();
+
+  // initial load
+  setGame(initialPath, initialName || (games.find(g=>g.path===initialPath)||{}).name || 'Play', initialDescription || (games.find(g=>g.path===initialPath)||{}).description || '');
+
+</script>
+</body>
+</html>

@@ -277,6 +277,7 @@
     align-items: center;
     margin-bottom: 12px;
     flex-shrink: 0;
+    gap: 8px;
   }
   .bookmarks-title {
     font-family: 'Montserrat', sans-serif;
@@ -285,7 +286,11 @@
     color: #eee;
     margin: 0;
   }
-  .add-bookmark-btn {
+  .bookmarks-buttons {
+    display: flex;
+    gap: 8px;
+  }
+  .add-bookmark-btn, .export-btn, .import-btn {
     background-color: #b88640;
     border: none;
     padding: 8px 16px;
@@ -296,9 +301,26 @@
     color: #0f0e0e;
     transition: background-color 0.3s ease;
     font-size: 13px;
+    white-space: nowrap;
   }
-  .add-bookmark-btn:hover {
+  .add-bookmark-btn:hover, .export-btn:hover, .import-btn:hover {
     background-color: #ddb86a;
+  }
+  .export-btn {
+    background-color: rgba(184,134,72,0.3);
+    color: #eee;
+    border: 2px solid #b88640;
+  }
+  .export-btn:hover {
+    background-color: rgba(184,134,72,0.5);
+  }
+  .import-btn {
+    background-color: rgba(184,134,72,0.3);
+    color: #eee;
+    border: 2px solid #b88640;
+  }
+  .import-btn:hover {
+    background-color: rgba(184,134,72,0.5);
   }
   .bookmarks-grid {
     display: grid;
@@ -524,6 +546,54 @@
     background-color: rgba(184,134,72,0.2);
   }
 
+  /* Import Modal Textarea */
+  .import-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+    background: #0f0e0e;
+    color: #eee;
+    outline-offset: 2px;
+    outline-color: #b88640;
+    resize: vertical;
+  }
+  .import-textarea::placeholder {
+    color: #b3a177cc;
+  }
+
+  /* Export Success Message */
+  .export-message {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    background: #b88640;
+    color: #0f0e0e;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(184,134,72,0.4);
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+    display: none;
+  }
+  .export-message.show {
+    display: block;
+  }
+  @keyframes slideIn {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
   /* Responsive adjustments */
   @media (max-width: 1200px) {
     main.content {
@@ -589,9 +659,17 @@
       <section class="bookmarks-section">
         <div class="bookmarks-header">
           <h2 class="bookmarks-title">Bookmarks<span style="color: #b88640;">.</span></h2>
-          <button class="add-bookmark-btn" id="addBookmarkBtn">
-            <i class="fa-solid fa-plus"></i> Add
-          </button>
+          <div class="bookmarks-buttons">
+            <button class="export-btn" id="exportBookmarksBtn" title="Export bookmarks as JSON">
+              <i class="fa-solid fa-download"></i>
+            </button>
+            <button class="import-btn" id="importBookmarksBtn" title="Import bookmarks from JSON">
+              <i class="fa-solid fa-upload"></i>
+            </button>
+            <button class="add-bookmark-btn" id="addBookmarkBtn">
+              <i class="fa-solid fa-plus"></i> Add
+            </button>
+          </div>
         </div>
         <div class="bookmarks-grid" id="bookmarksGrid">
           <div class="empty-bookmarks">No bookmarks yet!</div>
@@ -738,6 +816,25 @@
       </div>
     </form>
   </div>
+</div>
+
+<!-- Import Bookmarks Modal -->
+<div class="modal" id="importModal">
+  <div class="modal-content">
+    <h2 class="modal-title">Import Bookmarks</h2>
+    <form class="modal-form" id="importForm">
+      <textarea id="importTextarea" class="import-textarea" placeholder="Paste your exported JSON here..."></textarea>
+      <div class="modal-buttons">
+        <button type="button" class="modal-btn modal-btn-secondary" id="cancelImportBtn">Cancel</button>
+        <button type="submit" class="modal-btn modal-btn-primary">Import</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Export Success Message -->
+<div class="export-message" id="exportMessage">
+  <i class="fa-solid fa-check"></i> Bookmarks copied to clipboard!
 </div>
 
 <script>
@@ -921,6 +1018,88 @@
 
   // Initial render
   renderBookmarks();
+
+  // ===== EXPORT/IMPORT BOOKMARKS =====
+  const exportBtn = document.getElementById('exportBookmarksBtn');
+  const importBtn = document.getElementById('importBookmarksBtn');
+  const importModal = document.getElementById('importModal');
+  const importForm = document.getElementById('importForm');
+  const importTextarea = document.getElementById('importTextarea');
+  const cancelImportBtn = document.getElementById('cancelImportBtn');
+  const exportMessage = document.getElementById('exportMessage');
+
+  // Export bookmarks to clipboard
+  exportBtn.addEventListener('click', () => {
+    const json = JSON.stringify(bookmarks, null, 2);
+    navigator.clipboard.writeText(json).then(() => {
+      exportMessage.classList.add('show');
+      setTimeout(() => {
+        exportMessage.classList.remove('show');
+      }, 3000);
+    }).catch(err => {
+      alert('Failed to copy to clipboard. Here is your JSON:\n\n' + json);
+    });
+  });
+
+  // Open import modal
+  importBtn.addEventListener('click', () => {
+    importModal.classList.add('active');
+  });
+
+  // Cancel import
+  cancelImportBtn.addEventListener('click', () => {
+    importModal.classList.remove('active');
+    importTextarea.value = '';
+  });
+
+  // Import bookmarks from JSON
+  importForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    try {
+      const json = importTextarea.value.trim();
+      const imported = JSON.parse(json);
+      
+      if(!Array.isArray(imported)) {
+        throw new Error('Invalid format: Expected an array');
+      }
+
+      // Validate each bookmark has required fields
+      for(let bookmark of imported) {
+        if(!bookmark.name || !bookmark.url) {
+          throw new Error('Invalid bookmark format: Missing name or url');
+        }
+      }
+
+      // Merge with existing bookmarks (avoid duplicates by URL)
+      const existingUrls = new Set(bookmarks.map(b => b.url));
+      const newBookmarks = imported.filter(b => !existingUrls.has(b.url));
+      
+      bookmarks = [...bookmarks, ...newBookmarks];
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+      renderBookmarks();
+      
+      importModal.classList.remove('active');
+      importTextarea.value = '';
+      
+      // Show success message
+      exportMessage.innerHTML = '<i class="fa-solid fa-check"></i> Imported ' + newBookmarks.length + ' new bookmarks!';
+      exportMessage.classList.add('show');
+      setTimeout(() => {
+        exportMessage.classList.remove('show');
+        exportMessage.innerHTML = '<i class="fa-solid fa-check"></i> Bookmarks copied to clipboard!';
+      }, 3000);
+    } catch(err) {
+      alert('Failed to import bookmarks: ' + err.message);
+    }
+  });
+
+  // Close import modal on outside click
+  importModal.addEventListener('click', (e) => {
+    if(e.target === importModal) {
+      importModal.classList.remove('active');
+      importTextarea.value = '';
+    }
+  });
 
   // ===== MAIN MENU =====
   const menuOverlay = document.getElementById('mainMenuOverlay');

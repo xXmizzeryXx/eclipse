@@ -1,0 +1,13 @@
+{
+  "headers": [
+    {
+      "source": "/assets/bg/background.mp4",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "video/mp4"
+        }
+      ]
+    }
+  ]
+}

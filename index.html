@@ -8,6 +8,542 @@
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <link rel="stylesheet" href="assets/css/styles.css" />
+<style>
+  /* Override main content to use grid */
+  main.content {
+    padding: 20px 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+    gap: 20px;
+    overflow-y: auto;
+    height: 100%;
+    position: relative;
+  }
+
+  /* Main Menu Button */
+  .main-menu-btn {
+    position: fixed;
+    bottom: 80px;
+    right: 30px;
+    background: linear-gradient(135deg, #b88640 0%, #ddb86a 100%);
+    border: none;
+    padding: 16px 28px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
+    cursor: pointer;
+    color: #0f0e0e;
+    font-size: 16px;
+    box-shadow: 0 4px 20px rgba(184,134,72,0.4);
+    transition: all 0.3s ease;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .main-menu-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(184,134,72,0.6);
+  }
+  .main-menu-btn i {
+    font-size: 18px;
+  }
+
+  /* Main Menu Overlay */
+  .main-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 72px;
+    right: 0;
+    bottom: 0;
+    background: rgba(15,14,14,0.95);
+    backdrop-filter: blur(10px);
+    z-index: 90;
+    padding: 40px;
+    overflow-y: auto;
+  }
+  .main-menu-overlay.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .menu-close-btn {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    background: transparent;
+    border: 2px solid #b88640;
+    color: #b88640;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+  .menu-close-btn:hover {
+    background: #b88640;
+    color: #0f0e0e;
+    transform: rotate(90deg);
+  }
+
+  .menu-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+
+  .menu-section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #b88640;
+    margin: 0 0 20px 0;
+    grid-column: 1 / -1;
+  }
+
+  /* Hide main menu button when menu is open */
+  .main-menu-overlay.active ~ .app .main-menu-btn {
+    display: none;
+  }
+
+  /* Header spanning full width */
+  header.top-bar {
+    grid-column: 1 / -1;
+    gap: 32px;
+  }
+  header.top-bar h1.logo {
+    font-size: 36px;
+  }
+  .date-time {
+    font-size: 18px;
+  }
+  .date-box {
+    padding: 4px 12px;
+    margin-bottom: 8px;
+  }
+
+  /* Search bar spanning full width */
+  .search-bar {
+    grid-column: 1 / -1;
+    max-width: 100%;
+  }
+  .search-bar input[type="text"] {
+    padding: 12px 16px;
+  }
+  .search-bar button {
+    padding: 12px 24px;
+  }
+
+  /* Left column */
+  .left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 0;
+  }
+
+  /* Right column */
+  .right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 0;
+  }
+
+  /* Tab Cloaking - Compact */
+  .cloak-section {
+    background: #1e160b;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 0 20px rgba(184,134,72,0.15);
+  }
+  .cloak-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .cloak-header i {
+    font-size: 20px;
+    color: #b88640;
+  }
+  .cloak-header h3 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #eee;
+    margin: 0;
+  }
+  .cloak-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .cloak-input {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    font-family: inherit;
+    background: #0f0e0e;
+    color: #eee;
+    outline-offset: 2px;
+    outline-color: #b88640;
+  }
+  .cloak-input::placeholder {
+    color: #b3a177cc;
+  }
+  .cloak-buttons {
+    display: flex;
+    gap: 8px;
+    grid-column: 1 / -1;
+  }
+  .cloak-btn {
+    flex: 1;
+    background-color: #b88640;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: #0f0e0e;
+    transition: background-color 0.3s ease;
+    font-size: 13px;
+  }
+  .cloak-btn:hover {
+    background-color: #ddb86a;
+  }
+  .cloak-presets {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .preset-btn {
+    background: rgba(184,134,72,0.2);
+    border: 1px solid #b88640;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #eee;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .preset-btn:hover {
+    background: #b88640;
+    color: #0f0e0e;
+  }
+
+  /* Quick Access - Compact */
+  .quick-access {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    max-width: 100%;
+  }
+  .quick-access a {
+    padding: 12px 8px;
+    font-size: 13px;
+    min-width: auto;
+    max-width: none;
+  }
+  .quick-access a i {
+    font-size: 20px;
+  }
+
+  /* Bookmarks Section - Scrollable */
+  .bookmarks-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .bookmarks-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+  }
+  .bookmarks-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #eee;
+    margin: 0;
+  }
+  .add-bookmark-btn {
+    background-color: #b88640;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: #0f0e0e;
+    transition: background-color 0.3s ease;
+    font-size: 13px;
+  }
+  .add-bookmark-btn:hover {
+    background-color: #ddb86a;
+  }
+  .bookmarks-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+  .bookmarks-grid::-webkit-scrollbar {
+    width: 6px;
+  }
+  .bookmarks-grid::-webkit-scrollbar-track {
+    background: #0f0e0e;
+    border-radius: 3px;
+  }
+  .bookmarks-grid::-webkit-scrollbar-thumb {
+    background: #b88640;
+    border-radius: 3px;
+  }
+  .bookmark-item {
+    background: #1e160b;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    color: #eee;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 0 15px rgba(184,134,72,0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+  }
+  .bookmark-item:hover {
+    background: #b88640;
+    color: #0f0e0e;
+    box-shadow: 0 0 25px #b88640;
+  }
+  .bookmark-item i.bookmark-icon {
+    font-size: 20px;
+  }
+  .bookmark-name {
+    font-size: 13px;
+    word-break: break-word;
+  }
+  .delete-bookmark {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(184,134,72,0.3);
+    border: none;
+    color: #eee;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 10px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  .bookmark-item:hover .delete-bookmark {
+    display: flex;
+  }
+  .delete-bookmark:hover {
+    background: #d44;
+    color: #fff;
+  }
+  .empty-bookmarks {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    color: #bdb1a0;
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  /* Changelog - Scrollable */
+  .changelog-section {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .changelog-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: #eee;
+    margin: 0 0 12px 0;
+    flex-shrink: 0;
+  }
+  .changelog-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    padding-right: 5px;
+  }
+  .changelog-items::-webkit-scrollbar {
+    width: 6px;
+  }
+  .changelog-items::-webkit-scrollbar-track {
+    background: #0f0e0e;
+    border-radius: 3px;
+  }
+  .changelog-items::-webkit-scrollbar-thumb {
+    background: #b88640;
+    border-radius: 3px;
+  }
+  .changelog-item {
+    background: #1e160b;
+    border-radius: 10px;
+    padding: 12px 16px;
+    box-shadow: 0 0 15px rgba(184,134,72,0.15);
+    border-left: 4px solid #b88640;
+    flex-shrink: 0;
+  }
+  .changelog-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .changelog-version {
+    font-weight: 700;
+    color: #b88640;
+    font-size: 14px;
+  }
+  .changelog-date {
+    font-size: 12px;
+    color: #bdb1a0;
+  }
+  .changelog-text {
+    color: #ddd;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal.active {
+    display: flex;
+  }
+  .modal-content {
+    background: #1e160b;
+    border-radius: 12px;
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 0 40px rgba(184,134,72,0.3);
+    border: 2px solid #b88640;
+  }
+  .modal-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #eee;
+    margin: 0 0 20px 0;
+  }
+  .modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .modal-input {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    font-family: inherit;
+    background: #0f0e0e;
+    color: #eee;
+    outline-offset: 2px;
+    outline-color: #b88640;
+  }
+  .modal-input::placeholder {
+    color: #b3a177cc;
+  }
+  .modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+  .modal-btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    font-size: 15px;
+    border: none;
+    transition: all 0.3s ease;
+  }
+  .modal-btn-primary {
+    background-color: #b88640;
+    color: #0f0e0e;
+  }
+  .modal-btn-primary:hover {
+    background-color: #ddb86a;
+  }
+  .modal-btn-secondary {
+    background-color: transparent;
+    color: #eee;
+    border: 2px solid #b88640;
+  }
+  .modal-btn-secondary:hover {
+    background-color: rgba(184,134,72,0.2);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1200px) {
+    main.content {
+      grid-template-columns: 1fr;
+      overflow-y: auto;
+    }
+    .left-column, .right-column {
+      grid-column: 1;
+    }
+    .menu-content {
+      grid-template-columns: 1fr;
+    }
+    .main-menu-btn {
+      bottom: 70px;
+      right: 20px;
+      padding: 14px 24px;
+      font-size: 14px;
+    }
+  }
+</style>
 </head>
 <body>
 
@@ -16,10 +552,126 @@
   <source src="assets/bg/background.mp4" type="video/mp4">
 </video>
 
+<!-- Main Menu Overlay -->
+<div class="main-menu-overlay" id="mainMenuOverlay">
+  <button class="menu-close-btn" id="closeMenuBtn">
+    <i class="fa-solid fa-times"></i>
+  </button>
+  
+  <div class="menu-content">
+    <h2 class="menu-section-title">Main Menu<span style="color: #eee;">.</span></h2>
+    
+    <!-- Left Column in Menu -->
+    <div class="left-column">
+      <!-- Quick Access -->
+      <section class="quick-access">
+        <a href="#" data-url="https://www.youtube.com" class="proxy-link">
+          <i class="fa-brands fa-youtube"></i> YouTube
+        </a>
+        <a href="#" data-url="https://open.spotify.com" class="proxy-link">
+          <i class="fa-brands fa-spotify"></i> Spotify
+        </a>
+        <a href="#" data-url="https://discord.com" class="proxy-link">
+          <i class="fa-brands fa-discord"></i> Discord
+        </a>
+        <a href="#" data-url="https://www.twitch.tv" class="proxy-link">
+          <i class="fa-brands fa-twitch"></i> Twitch
+        </a>
+        <a href="#" data-url="https://github.com" class="proxy-link">
+          <i class="fa-brands fa-github"></i> GitHub
+        </a>
+        <a href="#" data-url="https://instagram.com" class="proxy-link">
+          <i class="fa-brands fa-instagram"></i> Instagram
+        </a>
+      </section>
+
+      <!-- Bookmarks -->
+      <section class="bookmarks-section">
+        <div class="bookmarks-header">
+          <h2 class="bookmarks-title">Bookmarks<span style="color: #b88640;">.</span></h2>
+          <button class="add-bookmark-btn" id="addBookmarkBtn">
+            <i class="fa-solid fa-plus"></i> Add
+          </button>
+        </div>
+        <div class="bookmarks-grid" id="bookmarksGrid">
+          <div class="empty-bookmarks">No bookmarks yet!</div>
+        </div>
+      </section>
+
+      <!-- Tab Cloaking -->
+      <section class="cloak-section">
+        <div class="cloak-header">
+          <i class="fa-solid fa-mask"></i>
+          <h3>Tab Cloaking</h3>
+        </div>
+        <div class="cloak-controls">
+          <input type="text" id="cloakTitle" class="cloak-input" placeholder="Tab title..." />
+          <input type="text" id="cloakFavicon" class="cloak-input" placeholder="Favicon URL..." />
+          <div class="cloak-buttons">
+            <button id="applyCloakBtn" class="cloak-btn">Apply</button>
+            <button id="resetCloakBtn" class="cloak-btn">Reset</button>
+          </div>
+        </div>
+        <div class="cloak-presets">
+          <button class="preset-btn" data-title="Google" data-favicon="https://www.google.com/favicon.ico">Google</button>
+          <button class="preset-btn" data-title="Google Docs" data-favicon="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico">Docs</button>
+          <button class="preset-btn" data-title="Google Classroom" data-favicon="https://ssl.gstatic.com/classroom/favicon.png">Classroom</button>
+          <button class="preset-btn" data-title="Canvas" data-favicon="https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico">Canvas</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Right Column in Menu -->
+    <div class="right-column">
+      <!-- Changelog -->
+      <section class="changelog-section">
+        <h2 class="changelog-title">Changelog<span style="color: #b88640;">.</span></h2>
+        <div class="changelog-items">
+          <div class="changelog-item">
+            <div class="changelog-header-row">
+              <span class="changelog-version">v1.2.0</span>
+              <span class="changelog-date">Dec 8, 2024</span>
+            </div>
+            <p class="changelog-text">
+              • Added bookmarks feature<br>
+              • Added tab cloaking<br>
+              • Added main menu overlay<br>
+              • Optimized no-scroll layout<br>
+              • Improved responsiveness
+            </p>
+          </div>
+          <div class="changelog-item">
+            <div class="changelog-header-row">
+              <span class="changelog-version">v1.1.0</span>
+              <span class="changelog-date">Dec 8, 2024</span>
+            </div>
+            <p class="changelog-text">
+              • Added games page<br>
+              • Improved search functionality<br>
+              • Fixed proxy routing issues
+            </p>
+          </div>
+          <div class="changelog-item">
+            <div class="changelog-header-row">
+              <span class="changelog-version">v1.0.0</span>
+              <span class="changelog-date">Dec 7, 2024</span>
+            </div>
+            <p class="changelog-text">
+              • Initial release<br>
+              • Basic proxy functionality<br>
+              • Quick access links<br>
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
 <div class="app">
   <!-- Sidebar -->
   <nav class="sidebar" aria-label="Main sidebar navigation">
-    <div class="icon" title="Home" onclick="window.location.href='index.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="icon active" title="Home" onclick="window.location.href='index.html'"><i class="fa-solid fa-house"></i></div>
     <div class="icon" title="Browser" onclick="window.location.href='frame.html'"><i class="fa-solid fa-globe"></i></div>
     <div class="icon" title="Dark Mode"><i class="fa-solid fa-moon"></i></div>
     <div class="icon" title="Games" onclick="window.location.href='games.html'"><i class="fa-solid fa-gamepad"></i></div>
@@ -29,17 +681,15 @@
   </nav>
 
   <!-- Main content -->
-  <main class="content" role="main" aria-label="Main content area">
+  <main class="content" role="main">
 
     <!-- Header -->
     <header class="top-bar">
-      <h1 class="logo" aria-label="Eclipse branding">
+      <h1 class="logo">
         eclipse<span class="dot">.</span>
       </h1>
-
-      <!-- Date/Time -->
-      <div class="date-time" aria-live="polite" aria-atomic="true" role="region" aria-label="Current date and time">
-        <span class="date-box" id="dateBox" aria-label="Current date"></span>
+      <div class="date-time">
+        <span class="date-box" id="dateBox"></span>
         <div class="date-time-line">
           <span class="prefix">T</span>
           <span class="time-word" id="hourWord"></span>
@@ -52,70 +702,46 @@
     </header>
 
     <!-- Search -->
-    <form class="search-bar" onsubmit="return false;" role="search" aria-label="Search or browse">
-      <input id="searchInput" type="text" placeholder="Enter URL or search..." aria-label="Search or enter URL" autocomplete="off" />
+    <form class="search-bar" onsubmit="return false;">
+      <input id="searchInput" type="text" placeholder="Enter URL or search..." autocomplete="off" />
       <button type="submit" id="searchBtn">Browse →</button>
     </form>
 
-    <!-- Quick Access -->
-    <section class="quick-access" aria-label="Quick access links">
-      <a href="#" data-url="https://www.youtube.com" class="proxy-link" aria-label="YouTube">
-        <i class="fa-brands fa-youtube"></i> YouTube
-      </a>
-      <a href="#" data-url="https://open.spotify.com" class="proxy-link" aria-label="Spotify">
-        <i class="fa-brands fa-spotify"></i> Spotify
-      </a>
-      <a href="#" data-url="https://discord.com" class="proxy-link" aria-label="Discord">
-        <i class="fa-brands fa-discord"></i> Discord
-      </a>
-      <a href="#" data-url="https://www.twitch.tv" class="proxy-link" aria-label="Twitch">
-        <i class="fa-brands fa-twitch"></i> Twitch
-      </a>
-      <a href="#" data-url="https://snapchat.com" class="proxy-link" aria-label="Twitter">
-        <i class="fa-brands fa-snapchat"></i> Snapchat
-      </a>
-      <a href="#" data-url="https://instagram.com" class="proxy-link" aria-label="Instagram">
-        <i class="fa-brands fa-instagram"></i> Instagram
-      </a>
-      <a href="#" data-url="https://netflix.com" class="proxy-link" aria-label="Netflix">
-        <i class="fa-solid fa-film"></i> Netflix
-      </a>
-      <a href="#" data-url="https://github.com" class="proxy-link" aria-label="GitHub">
-        <i class="fa-brands fa-github"></i> GitHub
-      </a>
-    </section>
-
-    <!-- Info cards -->
-    <section class="info-cards" aria-label="Information cards">
-      <article class="info-card" tabindex="0">
-        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-        <div class="info-text">
-          <strong>Encrypted Connection</strong>
-          <small>All traffic is encrypted and routed through secure servers</small>
-        </div>
-      </article>
-      <article class="info-card" tabindex="0">
-        <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-        <div class="info-text">
-          <strong>Lightning Fast</strong>
-          <small>Optimized for speed with minimal latency overhead</small>
-        </div>
-      </article>
-    </section>
-
   </main>
+
+  <!-- Main Menu Button -->
+  <button class="main-menu-btn" id="mainMenuBtn">
+    <i class="fa-solid fa-bars"></i>
+    Main Menu
+  </button>
 </div>
 
 <!-- Status bar -->
-<footer class="status-bar" aria-label="Status bar">
-  <span class="status-dot" aria-hidden="true"></span>
+<footer class="status-bar">
+  <span class="status-dot"></span>
   <span>Connected</span>
   <span>•</span>
   <span>100%</span>
 </footer>
 
+<!-- Add Bookmark Modal -->
+<div class="modal" id="bookmarkModal">
+  <div class="modal-content">
+    <h2 class="modal-title">Add Bookmark</h2>
+    <form class="modal-form" id="bookmarkForm">
+      <input type="text" id="bookmarkName" class="modal-input" placeholder="Bookmark name..." required />
+      <input type="text" id="bookmarkUrl" class="modal-input" placeholder="URL (e.g., https://example.com)..." required />
+      <input type="text" id="bookmarkIcon" class="modal-input" placeholder="Icon class (e.g., fa-star)..." />
+      <div class="modal-buttons">
+        <button type="button" class="modal-btn modal-btn-secondary" id="cancelBookmarkBtn">Cancel</button>
+        <button type="submit" class="modal-btn modal-btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
-  // Clock number to words conversion - stylized to match the original
+  // ===== CLOCK =====
   const ones = ["ZERO","ONE","TWO","THREE","FOUR","FIVE","SIX","SEVEN","EIGHT","NINE"];
   const teens = ["TEN","ELEVEN","TWELVE","THIRTEEN","FOURTEEN","FIFTEEN","SIXTEEN","SEVENTEEN","EIGHTEEN","NINETEEN"];
   const tens = ["","","TWENTY","THIRTY","FORTY","FIFTY"];
@@ -151,27 +777,23 @@
   updateDateTime();
   setInterval(updateDateTime, 60000);
 
-  // Search functionality - redirect to frame.html
+  // ===== SEARCH =====
   const searchInput = document.getElementById('searchInput');
   const searchBtn = document.getElementById('searchBtn');
 
   function performSearch(){
     let query = searchInput.value.trim();
     if(!query) return;
-    
-    // Build the frame.html URL with encoded query
     const frameURL = 'frame.html?q=' + encodeURIComponent(query);
     window.location.href = frameURL;
   }
 
   searchBtn.addEventListener('click', performSearch);
   searchInput.addEventListener('keydown', e => {
-    if(e.key === 'Enter'){
-      performSearch();
-    }
+    if(e.key === 'Enter') performSearch();
   });
 
-  // Quick access links - redirect through frame.html
+  // ===== QUICK ACCESS =====
   document.querySelectorAll('.proxy-link').forEach(link => {
     link.addEventListener('click', function(e){
       e.preventDefault();
@@ -179,6 +801,145 @@
       const frameURL = 'frame.html?q=' + encodeURIComponent(url);
       window.location.href = frameURL;
     });
+  });
+
+  // ===== TAB CLOAKING =====
+  const originalTitle = document.title;
+  const originalFavicon = document.querySelector('link[rel="icon"]').href;
+
+  document.getElementById('applyCloakBtn').addEventListener('click', () => {
+    const title = document.getElementById('cloakTitle').value.trim();
+    const favicon = document.getElementById('cloakFavicon').value.trim();
+    
+    if(title) {
+      document.title = title;
+      localStorage.setItem('cloakTitle', title);
+    }
+    if(favicon) {
+      document.querySelector('link[rel="icon"]').href = favicon;
+      localStorage.setItem('cloakFavicon', favicon);
+    }
+  });
+
+  document.getElementById('resetCloakBtn').addEventListener('click', () => {
+    document.title = originalTitle;
+    document.querySelector('link[rel="icon"]').href = originalFavicon;
+    document.getElementById('cloakTitle').value = '';
+    document.getElementById('cloakFavicon').value = '';
+    localStorage.removeItem('cloakTitle');
+    localStorage.removeItem('cloakFavicon');
+  });
+
+  // Preset buttons
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const title = this.getAttribute('data-title');
+      const favicon = this.getAttribute('data-favicon');
+      document.getElementById('cloakTitle').value = title;
+      document.getElementById('cloakFavicon').value = favicon;
+      document.title = title;
+      document.querySelector('link[rel="icon"]').href = favicon;
+      localStorage.setItem('cloakTitle', title);
+      localStorage.setItem('cloakFavicon', favicon);
+    });
+  });
+
+  // Load saved cloak on page load
+  const savedTitle = localStorage.getItem('cloakTitle');
+  const savedFavicon = localStorage.getItem('cloakFavicon');
+  if(savedTitle) {
+    document.title = savedTitle;
+    document.getElementById('cloakTitle').value = savedTitle;
+  }
+  if(savedFavicon) {
+    document.querySelector('link[rel="icon"]').href = savedFavicon;
+    document.getElementById('cloakFavicon').value = savedFavicon;
+  }
+
+  // ===== BOOKMARKS =====
+  let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+
+  function renderBookmarks() {
+    const grid = document.getElementById('bookmarksGrid');
+    
+    if(bookmarks.length === 0) {
+      grid.innerHTML = '<div class="empty-bookmarks">No bookmarks yet!</div>';
+      return;
+    }
+
+    grid.innerHTML = bookmarks.map((bookmark, index) => `
+      <a href="frame.html?q=${encodeURIComponent(bookmark.url)}" class="bookmark-item">
+        <i class="fa-solid ${bookmark.icon || 'fa-bookmark'} bookmark-icon"></i>
+        <span class="bookmark-name">${bookmark.name}</span>
+        <button class="delete-bookmark" onclick="deleteBookmark(event, ${index})">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </a>
+    `).join('');
+  }
+
+  function deleteBookmark(e, index) {
+    e.preventDefault();
+    e.stopPropagation();
+    bookmarks.splice(index, 1);
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    renderBookmarks();
+  }
+
+  // Modal controls
+  const modal = document.getElementById('bookmarkModal');
+  const addBtn = document.getElementById('addBookmarkBtn');
+  const cancelBtn = document.getElementById('cancelBookmarkBtn');
+  const form = document.getElementById('bookmarkForm');
+
+  addBtn.addEventListener('click', () => modal.classList.add('active'));
+  cancelBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+    form.reset();
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('bookmarkName').value.trim();
+    const url = document.getElementById('bookmarkUrl').value.trim();
+    const icon = document.getElementById('bookmarkIcon').value.trim() || 'fa-bookmark';
+
+    bookmarks.push({ name, url, icon });
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    renderBookmarks();
+    modal.classList.remove('active');
+    form.reset();
+  });
+
+  // Close modal on outside click
+  modal.addEventListener('click', (e) => {
+    if(e.target === modal) {
+      modal.classList.remove('active');
+      form.reset();
+    }
+  });
+
+  // Initial render
+  renderBookmarks();
+
+  // ===== MAIN MENU =====
+  const menuOverlay = document.getElementById('mainMenuOverlay');
+  const mainMenuBtn = document.getElementById('mainMenuBtn');
+  const closeMenuBtn = document.getElementById('closeMenuBtn');
+
+  mainMenuBtn.addEventListener('click', () => {
+    menuOverlay.classList.add('active');
+  });
+
+  closeMenuBtn.addEventListener('click', () => {
+    menuOverlay.classList.remove('active');
+  });
+
+  // Close menu on escape key
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && menuOverlay.classList.contains('active')) {
+      menuOverlay.classList.remove('active');
+    }
   });
 </script>
 </body>

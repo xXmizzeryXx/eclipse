@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>eclipse. - games</title>
+<link rel="icon" type="image/x-icon" href="assets/favicon/favicon.png" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+<style>
+  .games-header {
+    margin-bottom: 32px;
+  }
+
+  .games-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    color: #eee;
+    margin: 0 0 12px 0;
+  }
+
+  .games-subtitle {
+    font-size: 18px;
+    color: #bdb1a0;
+    margin: 0 0 24px 0;
+  }
+
+  .search-games {
+    display: flex;
+    gap: 12px;
+    max-width: 640px;
+    width: 100%;
+    margin-bottom: 32px;
+  }
+
+  .search-games input {
+    flex-grow: 1;
+    padding: 14px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    font-family: inherit;
+    background: #1e160b;
+    color: #eee;
+    outline-offset: 2px;
+    outline-color: #b88640;
+  }
+
+  .search-games input::placeholder {
+    color: #b3a177cc;
+  }
+
+  .category-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+
+  .filter-btn {
+    background: #1e160b;
+    border: 2px solid #b88640;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: #eee;
+    transition: all 0.3s ease;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background-color: #b88640;
+    color: #0f0e0e;
+  }
+
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+
+  .game-card {
+    background: #1e160b;
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(184,134,72,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px rgba(184,134,72,0.3);
+  }
+
+  .game-info {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .game-title {
+    font-weight: 700;
+    font-size: 18px;
+    color: #eee;
+    margin: 0;
+  }
+
+  .game-category {
+    font-size: 12px;
+    color: #b88640;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 8px;
+  }
+
+  .game-description {
+    font-size: 13px;
+    color: #bdb1a0;
+    line-height: 1.4;
+    margin: 8px 0 0 0;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #bdb1a0;
+    font-size: 18px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Video Background -->
+<video id="videoBG" autoplay muted loop playsinline>
+  <source src="assets/bg/background.mp4" type="video/mp4">
+</video>
+
+<div class="app">
+  <!-- Sidebar -->
+  <nav class="sidebar" aria-label="Main sidebar navigation">
+    <div class="icon" title="Home" onclick="window.location.href='index.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="icon" title="Browser" onclick="window.location.href='frame.html'"><i class="fa-solid fa-globe"></i></div>
+    <div class="icon" title="Dark Mode"><i class="fa-solid fa-moon"></i></div>
+    <div class="icon active" title="Games"><i class="fa-solid fa-gamepad"></i></div>
+    <div class="icon" title="Music"><i class="fa-solid fa-headphones"></i></div>
+    <div class="icon" title="Credits" onclick="window.location.href='credits.html'"><i class="fa-solid fa-book"></i></div>
+    <div class="icon" title="Settings"><i class="fa-solid fa-cog"></i></div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="content" role="main">
+    
+    <div class="games-header">
+      <h1 class="games-title" id="pageTitle">
+        games<span style="color: #b88640;">.</span>
+      </h1>
+      <p class="games-subtitle" id="pageSubtitle">Browse and play popular unblocked games</p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-games">
+      <input type="text" id="gameSearch" placeholder="Search games..." />
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filters">
+      <button class="filter-btn active" data-category="all">All Games</button>
+      <button class="filter-btn" data-category="action">Action</button>
+      <button class="filter-btn" data-category="puzzle">Puzzle</button>
+      <button class="filter-btn" data-category="racing">Racing</button>
+      <button class="filter-btn" data-category="strategy">Strategy</button>
+      <button class="filter-btn" data-category="sports">Sports</button>
+      <button class="filter-btn" data-category="arcade">Arcade</button>
+    </div>
+
+    <!-- Games Grid -->
+    <div class="games-grid" id="gamesGrid">
+      <!-- Games will be populated by JavaScript -->
+    </div>
+
+    <div class="no-results" id="noResults" style="display: none;">
+      No games found. Try a different search or category.
+    </div>
+
+  </main>
+</div>
+
+<!-- Status bar -->
+<footer class="status-bar" aria-label="Status bar">
+  <span class="status-dot" aria-hidden="true"></span>
+  <span>Connected</span>
+  <span>•</span>
+  <span id="gameCount">0</span>
+  <span>Games Available</span>
+</footer>
+
+<script>
+  // ===== CONFIGURATION =====
+  // Edit page text here
+  const pageConfig = {
+    title: "games",  // Title text (don't include the dot)
+    subtitle: "Browse and play popular unblocked games",
+    header: "games - eclipse."  // Browser tab title
+  };
+
+  const games = [
+    { 
+      name: "Time Shooter 2", 
+      category: "action", 
+      path: "games/timeshooter2.html", 
+      description: "Time moves only when you move." 
+    },
+    { 
+      name: "Slope", 
+      category: "arcade", 
+      path: "games/slope.html", 
+      description: "Don't let the ball crash." 
+    },
+    { 
+      name: "Tomb of the Mask", 
+      category: "puzzle", 
+      path: "games/tomb-of-the-mask.html", 
+      description: "Get the yellow guy through the levels." 
+    },
+    { 
+      name: "Task Force: Eclipse", 
+      category: "strategy", 
+      path: "games/eclipse.html", 
+      description: "Strategic shooter and tactics." 
+    },
+    { 
+      name: "Retro Bowl", 
+      category: "sports", 
+      path: "games/retro-bowl/index.html", 
+      description: "Football like the 80's." 
+    },
+  ];
+
+  // ===== DO NOT EDIT BELOW THIS LINE =====
+  
+  // Apply page configuration
+  document.title = pageConfig.header;
+  document.getElementById('pageTitle').innerHTML = pageConfig.title + '<span style="color: #b88640;">.</span>';
+  document.getElementById('pageSubtitle').textContent = pageConfig.subtitle;
+
+  let currentCategory = 'all';
+  let searchQuery = '';
+
+  // Render games
+  function renderGames() {
+    const grid = document.getElementById('gamesGrid');
+    const noResults = document.getElementById('noResults');
+    
+    let filtered = games.filter(game => {
+      const matchesCategory = currentCategory === 'all' || game.category === currentCategory;
+      const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           game.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+      grid.style.display = 'none';
+      noResults.style.display = 'block';
+    } else {
+      grid.style.display = 'grid';
+      noResults.style.display = 'none';
+      
+      grid.innerHTML = filtered.map(game => `
+        <a href="${game.path}" class="game-card">
+          <div class="game-info">
+            <h3 class="game-title">${game.name}</h3>
+            <div class="game-category">${game.category}</div>
+            <p class="game-description">${game.description}</p>
+          </div>
+        </a>
+      `).join('');
+    }
+
+    document.getElementById('gameCount').textContent = filtered.length;
+  }
+
+  // Category filter buttons
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      currentCategory = this.getAttribute('data-category');
+      renderGames();
+    });
+  });
+
+  // Search functionality
+  document.getElementById('gameSearch').addEventListener('input', function(e) {
+    searchQuery = e.target.value;
+    renderGames();
+  });
+
+  // Initial render
+  renderGames();
+</script>
+</body>
+</html>

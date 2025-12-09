@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>movies - eclipse.</title>
+<link rel="icon" type="image/x-icon" href="assets/favicon/favicon.png" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Raleway:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+<style>
+  main.content {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    height: 100vh;
+    flex: 1;
+  }
+
+  .movies-iframe-container {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .movies-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    margin: 0;
+    padding: 0;
+  }
+
+  footer.status-bar {
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<video id="videoBG" autoplay muted loop playsinline>
+  <source src="assets/bg/background.mp4" type="video/mp4">
+</video>
+
+<div class="app">
+  <nav class="sidebar" aria-label="Main sidebar navigation">
+    <div class="icon" title="Home" onclick="window.location.href='index.html'"><i class="fa-solid fa-house"></i></div>
+    <div class="icon" title="Browser" onclick="window.location.href='frame.html'"><i class="fa-solid fa-globe"></i></div>
+    <div class="icon" title="Emergency Cloaking" id="randomCloakBtn"><i class="fa-solid fa-moon"></i></div>
+    <div class="icon" title="Games" onclick="window.location.href='games.html'"><i class="fa-solid fa-gamepad"></i></div>
+    <div class="icon" title="Music" onclick="window.location.href='music.html'"><i class="fa-solid fa-headphones"></i></div>
+    <div class="icon active" title="Movies" onclick="window.location.href='movies.html'"><i class="fa-solid fa-film"></i></div>
+    <div class="icon" title="Credits" onclick="window.location.href='credits.html'"><i class="fa-solid fa-book"></i></div>
+    <div class="icon" title="Settings" onclick="window.location.href='settings.html'"><i class="fa-solid fa-cog"></i></div>
+  </nav>
+
+  <main class="content" role="main">
+    <div class="movies-iframe-container">
+      <iframe class="movies-iframe" src="searcher.html?q=https%3A%2F%2Fmovies.waves.lat&backend=ultraviolet&wisp=wss%3A%2F%2Fwisp.rhw.one%2F" allowfullscreen></iframe>
+    </div>
+  </main>
+</div>
+
+<footer class="status-bar">
+  <span class="status-dot"></span>
+  <span>Connected</span>
+  <span>•</span>
+  <span>Movies</span>
+</footer>
+
+<script>
+  // Emergency cloak
+  const cloakPresets = [
+    { title: "Google", favicon: "https://www.google.com/favicon.ico" },
+    { title: "Google Docs", favicon: "https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" },
+    { title: "Google Classroom", favicon: "https://ssl.gstatic.com/classroom/favicon.png" }
+  ];
+
+  document.getElementById('randomCloakBtn').addEventListener('click', () => {
+    const randomPreset = cloakPresets[Math.floor(Math.random() * cloakPresets.length)];
+    document.title = randomPreset.title;
+    document.querySelector('link[rel="icon"]').href = randomPreset.favicon;
+  });
+</script>
+</body>
+</html>

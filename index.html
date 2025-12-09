@@ -545,7 +545,85 @@
   .modal-btn-secondary:hover {
     background-color: rgba(184,134,72,0.2);
   }
+/* Visitor Stats Section */
+.stats-section {
+  grid-column: 1 / -1;
+  background: #1e160b;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 20px rgba(184,134,72,0.15);
+}
+.stats-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.stats-header i {
+  font-size: 24px;
+  color: #b88640;
+}
+.stats-header h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #eee;
+  margin: 0;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.stat-card {
+  background: #0f0e0e;
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid rgba(184,134,72,0.2);
+  transition: all 0.3s ease;
+}
+.stat-card:hover {
+  border-color: #b88640;
+  box-shadow: 0 0 20px rgba(184,134,72,0.2);
+}
+.stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #bdb1a0;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  color: #b88640;
+  margin-bottom: 4px;
+}
+.stat-value.loading {
+  color: #555;
+}
+.stat-description {
+  font-size: 12px;
+  color: #888;
+}
+.stats-error {
+  grid-column: 1 / -1;
+  background: rgba(220,68,68,0.1);
+  border: 1px solid rgba(220,68,68,0.3);
+  border-radius: 8px;
+  padding: 12px;
+  color: #ff8888;
+  font-size: 13px;
+  text-align: center;
+}
 
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
   /* Import Modal Textarea */
   .import-textarea {
     width: 100%;
@@ -630,8 +708,30 @@
   
   <div class="menu-content">
     <h2 class="menu-section-title">Main Menu<span style="color: #eee;">.</span></h2>
-    
-    <!-- Left Column in Menu -->
+    <section class="stats-section">
+  <div class="stats-header">
+    <i class="fa-solid fa-chart-line"></i>
+    <h3>Visitor Statistics</h3>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Today</div>
+      <div class="stat-value loading" id="dailyStat">...</div>
+      <div class="stat-description">Daily Visitors</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">This Month</div>
+      <div class="stat-value loading" id="monthlyStat">...</div>
+      <div class="stat-description">Monthly Visitors</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">All Time</div>
+      <div class="stat-value loading" id="allTimeStat">...</div>
+      <div class="stat-description">Total Visitors</div>
+    </div>
+  </div>
+  <div id="statsError" style="display: none;" class="stats-error"></div>
+</section>
     <div class="left-column">
       <!-- Quick Access -->
       <section class="quick-access">
@@ -1154,5 +1254,95 @@
     }
   });
 </script>
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB7w-f3_tw0FAOJ3BIxgJduCU3gXkyQ_J0",
+    authDomain: "eclipse-323423.firebaseapp.com",
+    projectId: "eclipse-323423",
+    storageBucket: "eclipse-323423.firebasestorage.app",
+    messagingSenderId: "164045623784",
+    appId: "1:164045623784:web:c079f81ad41d75787c145d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  function getDateKeys() {
+    const now = new Date();
+    const daily = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const monthly = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    return { daily, monthly };
+  }
+
+  async function trackVisit() {
+    try {
+      const { daily, monthly } = getDateKeys();
+      const visitedToday = sessionStorage.getItem('visited_today');
+      const lastVisitDate = sessionStorage.getItem('last_visit_date');
+      
+      if (visitedToday === 'true' && lastVisitDate === daily) {
+        await fetchStats();
+        return;
+      }
+
+      const dailyRef = doc(db, 'stats', `daily_${daily}`);
+      const dailyDoc = await getDoc(dailyRef);
+      if (dailyDoc.exists()) {
+        await updateDoc(dailyRef, { count: increment(1) });
+      } else {
+        await setDoc(dailyRef, { count: 1, date: daily });
+      }
+
+      const monthlyRef = doc(db, 'stats', `monthly_${monthly}`);
+      const monthlyDoc = await getDoc(monthlyRef);
+      if (monthlyDoc.exists()) {
+        await updateDoc(monthlyRef, { count: increment(1) });
+      } else {
+        await setDoc(monthlyRef, { count: 1, month: monthly });
+      }
+
+      const allTimeRef = doc(db, 'stats', 'all_time');
+      const allTimeDoc = await getDoc(allTimeRef);
+      if (allTimeDoc.exists()) {
+        await updateDoc(allTimeRef, { count: increment(1) });
+      } else {
+        await setDoc(allTimeRef, { count: 1 });
+      }
+
+      sessionStorage.setItem('visited_today', 'true');
+      sessionStorage.setItem('last_visit_date', daily);
+      await fetchStats();
+    } catch (err) {
+      console.error('Error tracking visit:', err);
+      document.getElementById('statsError').textContent = `⚠️ Error: ${err.message}`;
+      document.getElementById('statsError').style.display = 'block';
+    }
+  }
+
+  async function fetchStats() {
+    try {
+      const { daily, monthly } = getDateKeys();
+      const [dailyDoc, monthlyDoc, allTimeDoc] = await Promise.all([
+        getDoc(doc(db, 'stats', `daily_${daily}`)),
+        getDoc(doc(db, 'stats', `monthly_${monthly}`)),
+        getDoc(doc(db, 'stats', 'all_time'))
+      ]);
+
+      document.getElementById('dailyStat').textContent = (dailyDoc.exists() ? dailyDoc.data().count : 0).toLocaleString();
+      document.getElementById('monthlyStat').textContent = (monthlyDoc.exists() ? monthlyDoc.data().count : 0).toLocaleString();
+      document.getElementById('allTimeStat').textContent = (allTimeDoc.exists() ? allTimeDoc.data().count : 0).toLocaleString();
+      
+      document.querySelectorAll('.stat-value').forEach(el => el.classList.remove('loading'));
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+    }
+  }
+
+  trackVisit();
+</script>
+<script src="script.js"></script>
 </body>
 </html>

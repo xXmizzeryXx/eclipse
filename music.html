@@ -84,28 +84,95 @@
   </footer>
 
   <script>
-    // (Paste-link player removed — upload-only mode)
-
-    // ===== UPLOAD / PLAYLIST =====
+    // Upload-only playlist with persistence (IndexedDB + localStorage)
     const fileInput = document.getElementById('fileUpload');
     const playlistEl = document.getElementById('playlist');
     const audioPlayer = document.getElementById('audioPlayer');
     const uploadHint = document.getElementById('uploadHint');
+    const playerContainer = document.getElementById('playerContainer');
 
-    let playlist = [];
+    const STORAGE_KEY = 'eclipse_playlist_v1';
+    const DB_NAME = 'eclipse_music_db';
+    const STORE_NAME = 'tracks';
 
-    function addFiles(files) {
-      Array.from(files).forEach(file => {
-        if (!file.type.startsWith('audio/')) return;
-        const url = URL.createObjectURL(file);
-        const item = { name: file.name, url };
-        playlist.push(item);
+    let playlist = []; // {id,name,url}
+    let currentIndex = -1;
+
+    function openDB(){
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
       });
-      renderPlaylist();
-      // auto-play first added
-      if (playlist.length && audioPlayer.paused) {
-        playTrack(playlist.length - 1);
+    }
+
+    function saveBlobToDB(id, name, blob){
+      return openDB().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.put({ id, name, blob, created: Date.now() });
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      }));
+    }
+
+    function getBlobFromDB(id){
+      return openDB().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.get(id);
+        req.onsuccess = () => resolve(req.result ? req.result.blob : null);
+        req.onerror = () => reject(req.error);
+      }));
+    }
+
+    function deleteBlobFromDB(id){
+      return openDB().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        store.delete(id);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      }));
+    }
+
+    function savePlaylistToStorage(){
+      const data = playlist.map(p => ({ id: p.id, name: p.name }));
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) { console.warn('Failed to save playlist', e); }
+    }
+
+    async function loadPlaylistFromStorage(){
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const saved = JSON.parse(raw);
+        for (const s of saved){
+          const blob = await getBlobFromDB(s.id);
+          if (!blob) continue; // skip missing blobs
+          const url = URL.createObjectURL(blob);
+          playlist.push({ id: s.id, name: s.name, url });
+        }
+        renderPlaylist();
+      } catch(e){ console.warn('Failed to load playlist', e); }
+    }
+
+    async function addFiles(files){
+      for (const file of Array.from(files)){
+        if (!file.type.startsWith('audio/')) continue;
+        const id = Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+        try { await saveBlobToDB(id, file.name, file); } catch(e){ console.warn('Failed to save blob', e); }
+        const url = URL.createObjectURL(file);
+        playlist.push({ id, name: file.name, url });
       }
+      renderPlaylist();
+      savePlaylistToStorage();
+      if (playlist.length && audioPlayer.paused) playTrack(playlist.length - 1);
     }
 
     function renderPlaylist(){
@@ -114,7 +181,7 @@
         const a = document.createElement('a');
         a.className = 'side-item';
         a.href = '#';
-        a.setAttribute('data-url', p.url);
+        a.setAttribute('data-id', p.id);
         a.innerHTML = `<div class="meta"><div class="name">${p.name}</div><div class="cat">Uploaded</div></div>`;
         a.addEventListener('click', (e)=>{ e.preventDefault(); playTrack(i); });
 
@@ -136,8 +203,32 @@
         controlsWrap.appendChild(editBtn);
         controlsWrap.appendChild(removeBtn);
         a.appendChild(controlsWrap);
+
+        if (i === currentIndex) a.classList.add('active');
         playlistEl.appendChild(a);
       });
+    }
+
+    function playTrack(index){
+      const t = playlist[index];
+      if (!t) return;
+      currentIndex = index;
+      audioPlayer.src = t.url;
+      audioPlayer.play().catch(()=>{});
+      [...playlistEl.querySelectorAll('.side-item')].forEach((r, i) => r.classList.toggle('active', i===index));
+    }
+
+    async function removeTrack(index){
+      const t = playlist[index];
+      if (t){
+        try { URL.revokeObjectURL(t.url); } catch(e){}
+        try { await deleteBlobFromDB(t.id); } catch(e){ console.warn('Failed to delete blob from DB', e); }
+      }
+      playlist.splice(index,1);
+      if (currentIndex === index) { audioPlayer.pause(); audioPlayer.removeAttribute('src'); currentIndex = -1; }
+      else if (currentIndex > index) currentIndex--;
+      renderPlaylist();
+      savePlaylistToStorage();
     }
 
     function renameTrack(index){
@@ -148,38 +239,20 @@
       const trimmed = newName.trim();
       if (trimmed.length === 0) return alert('Name cannot be empty');
       playlist[index].name = trimmed;
+      // update DB record name too
+      saveBlobToDB(t.id, trimmed, null).catch(()=>{}); // if blob null, put will still update name if record exists
       renderPlaylist();
+      savePlaylistToStorage();
     }
 
-    function playTrack(index){
-      const t = playlist[index];
-      if (!t) return;
-      audioPlayer.style.display = 'block';
-      // no video player — audio player used
-      audioPlayer.src = t.url;
-      audioPlayer.play().catch(()=>{});
-      // highlight current (use active class)
-      [...playlistEl.querySelectorAll('.side-item')].forEach((r, i) => r.classList.toggle('active', i===index));
-    }
-
-    function removeTrack(index){
-      const t = playlist[index];
-      if (t) {
-        // revoke url
-        try { URL.revokeObjectURL(t.url); } catch(e){}
-      }
-      playlist.splice(index,1);
-      renderPlaylist();
-    }
-
-    // file input change
+    // wire inputs
     fileInput.addEventListener('change', (e)=> addFiles(e.target.files));
-
-    // drag & drop support on player container
-    const playerContainer = document.getElementById('playerContainer');
     ['dragenter','dragover'].forEach(ev => playerContainer.addEventListener(ev, (e)=>{ e.preventDefault(); playerContainer.style.outline = '2px dashed #b88640'; }));
     ['dragleave','drop'].forEach(ev => playerContainer.addEventListener(ev, (e)=>{ e.preventDefault(); playerContainer.style.outline = 'none'; }));
     playerContainer.addEventListener('drop', (e)=>{ const items = e.dataTransfer.files; addFiles(items); });
+
+    // load saved playlist
+    window.addEventListener('load', ()=> loadPlaylistFromStorage());
 
     // ===== EMERGENCY CLOAKING =====
     const cloakPresets = [

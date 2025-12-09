@@ -43,14 +43,24 @@
       <div class="player-area">
         <h2 style="color:#b88640; margin-bottom:16px;">Music Player</h2>
 
-        <div class="search-bar">
-          <input type="text" id="mediaLink" placeholder="Paste audio/video link here">
+        <div class="search-bar" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+          <input type="text" id="mediaLink" placeholder="Paste audio/video link here" style="flex:1;min-width:220px;">
           <button onclick="loadMedia()">Play</button>
+          <label for="fileUpload" class="btn" style="border-color:#b88640;color:#b88640;">Upload MP3</label>
+          <input id="fileUpload" type="file" accept="audio/*" multiple style="display:none;" />
         </div>
 
-        <div id="playerContainer" style="margin-top:24px; display:flex; flex-direction:column; gap:16px;">
-          <video id="mediaPlayer" controls style="width:100%; border-radius:12px; background:#1e160b; display:none;"></video>
-          <audio id="audioPlayer" controls style="width:100%; border-radius:12px; background:#1e160b; display:none;"></audio>
+        <div id="playerContainer" style="margin-top:24px; display:flex; gap:16px; align-items:flex-start;">
+          <div style="flex:1; display:flex; flex-direction:column; gap:12px;">
+            <video id="mediaPlayer" controls style="width:100%; border-radius:12px; background:#1e160b; display:none;"></video>
+            <audio id="audioPlayer" controls style="width:100%; border-radius:12px; background:#1e160b; display:block;"></audio>
+            <div id="uploadHint" style="color:#bdb1a0;font-size:13px">You can also drag & drop MP3 files here.</div>
+          </div>
+
+          <aside style="width:300px; min-width:220px; background:#1e160b; padding:12px; border-radius:12px;">
+            <h4 style="margin:0 0 8px 0; color:#b88640; font-size:14px">Playlist</h4>
+            <div id="playlist" style="display:flex;flex-direction:column;gap:8px; max-height:60vh; overflow:auto;"></div>
+          </aside>
         </div>
       </div>
 
@@ -89,6 +99,103 @@
         alert("Unsupported media type.");
       }
     }
+
+    // ===== UPLOAD / PLAYLIST =====
+    const fileInput = document.getElementById('fileUpload');
+    const playlistEl = document.getElementById('playlist');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const mediaPlayer = document.getElementById('mediaPlayer');
+    const uploadHint = document.getElementById('uploadHint');
+
+    let playlist = [];
+
+    function addFiles(files) {
+      Array.from(files).forEach(file => {
+        if (!file.type.startsWith('audio/')) return;
+        const url = URL.createObjectURL(file);
+        const item = { name: file.name, url };
+        playlist.push(item);
+      });
+      renderPlaylist();
+      // auto-play first added
+      if (playlist.length && audioPlayer.paused) {
+        playTrack(playlist.length - 1);
+      }
+    }
+
+    function renderPlaylist(){
+      playlistEl.innerHTML = '';
+      playlist.forEach((p, i) => {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.justifyContent = 'space-between';
+        row.style.gap = '8px';
+
+        const info = document.createElement('div');
+        info.style.flex = '1';
+        info.style.overflow = 'hidden';
+        const name = document.createElement('div');
+        name.textContent = p.name;
+        name.style.fontWeight = '700';
+        name.style.fontSize = '13px';
+        name.style.whiteSpace = 'nowrap';
+        name.style.textOverflow = 'ellipsis';
+        name.style.overflow = 'hidden';
+        info.appendChild(name);
+
+        const controls = document.createElement('div');
+        controls.style.display = 'flex';
+        controls.style.gap = '8px';
+
+        const playBtn = document.createElement('button');
+        playBtn.className = 'btn';
+        playBtn.textContent = 'Play';
+        playBtn.onclick = ()=> playTrack(i);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn';
+        delBtn.textContent = 'Remove';
+        delBtn.onclick = ()=> { removeTrack(i); };
+
+        controls.appendChild(playBtn);
+        controls.appendChild(delBtn);
+
+        row.appendChild(info);
+        row.appendChild(controls);
+        playlistEl.appendChild(row);
+      });
+    }
+
+    function playTrack(index){
+      const t = playlist[index];
+      if (!t) return;
+      audioPlayer.style.display = 'block';
+      mediaPlayer.style.display = 'none';
+      audioPlayer.src = t.url;
+      audioPlayer.play().catch(()=>{});
+      // highlight current
+      [...playlistEl.children].forEach((r, i) => r.style.background = i===index ? '#b88640' : 'transparent');
+    }
+
+    function removeTrack(index){
+      const t = playlist[index];
+      if (t) {
+        // revoke url
+        try { URL.revokeObjectURL(t.url); } catch(e){}
+      }
+      playlist.splice(index,1);
+      renderPlaylist();
+    }
+
+    // file input change
+    fileInput.addEventListener('change', (e)=> addFiles(e.target.files));
+
+    // drag & drop support on player container
+    const playerContainer = document.getElementById('playerContainer');
+    ['dragenter','dragover'].forEach(ev => playerContainer.addEventListener(ev, (e)=>{ e.preventDefault(); playerContainer.style.outline = '2px dashed #b88640'; }));
+    ['dragleave','drop'].forEach(ev => playerContainer.addEventListener(ev, (e)=>{ e.preventDefault(); playerContainer.style.outline = 'none'; }));
+    playerContainer.addEventListener('drop', (e)=>{ const items = e.dataTransfer.files; addFiles(items); });
 
     // ===== EMERGENCY CLOAKING =====
     const cloakPresets = [

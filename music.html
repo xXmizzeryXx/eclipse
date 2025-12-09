@@ -12,6 +12,17 @@
     header.top-bar .logo { font-size: 28px; }
     .content { padding: 28px; }
     .player-area { max-width: 900px; }
+    /* Playlist sidebar (match game-modal styles) */
+    .sidebar.playlist { width:320px; background:#1e160b; border-radius:12px; padding:16px; box-shadow:0 6px 24px rgba(0,0,0,0.4); }
+    .sidebar.playlist h4{margin:0 0 12px 0;font-size:14px;color:#b88640;text-transform:uppercase}
+    .game-list{display:flex;flex-direction:column;gap:10px;overflow:auto;max-height:60vh;padding-right:6px}
+    .side-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(0,0,0,0.05);cursor:pointer;color:#eee;text-decoration:none}
+    .side-item.active{background:#b88640;color:#0f0e0e}
+    .side-item .name{font-weight:700;font-size:14px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+    .side-item .cat{font-size:11px;color:#bdb1a0;text-transform:uppercase;margin-top:4px}
+    .side-item .meta{display:flex;flex-direction:column;flex:1;min-width:0;margin-right:8px}
+    .btn{background:transparent;border:2px solid #b88640;color:#b88640;padding:6px 10px;border-radius:8px;cursor:pointer}
+    .btn.small{padding:4px 8px;font-size:12px}
   </style>
 </head>
 <body>
@@ -54,9 +65,9 @@
             <div id="uploadHint" style="color:#bdb1a0;font-size:13px">You can also drag & drop MP3 files here.</div>
           </div>
 
-          <aside style="width:300px; min-width:220px; background:#1e160b; padding:12px; border-radius:12px;">
-            <h4 style="margin:0 0 8px 0; color:#b88640; font-size:14px">Playlist</h4>
-            <div id="playlist" style="display:flex;flex-direction:column;gap:8px; max-height:60vh; overflow:auto;"></div>
+          <aside class="sidebar playlist" aria-label="Playlist">
+            <h4>Playlist</h4>
+            <div class="game-list" id="playlist"></div>
           </aside>
         </div>
       </div>
@@ -100,44 +111,20 @@
     function renderPlaylist(){
       playlistEl.innerHTML = '';
       playlist.forEach((p, i) => {
-        const row = document.createElement('div');
-        row.style.display = 'flex';
-        row.style.alignItems = 'center';
-        row.style.justifyContent = 'space-between';
-        row.style.gap = '8px';
+        const a = document.createElement('a');
+        a.className = 'side-item';
+        a.href = '#';
+        a.setAttribute('data-url', p.url);
+        a.innerHTML = `<div class="meta"><div class="name">${p.name}</div><div class="cat">Uploaded</div></div>`;
+        a.addEventListener('click', (e)=>{ e.preventDefault(); playTrack(i); });
 
-        const info = document.createElement('div');
-        info.style.flex = '1';
-        info.style.overflow = 'hidden';
-        const name = document.createElement('div');
-        name.textContent = p.name;
-        name.style.fontWeight = '700';
-        name.style.fontSize = '13px';
-        name.style.whiteSpace = 'nowrap';
-        name.style.textOverflow = 'ellipsis';
-        name.style.overflow = 'hidden';
-        info.appendChild(name);
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'btn small';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); removeTrack(i); });
 
-        const controls = document.createElement('div');
-        controls.style.display = 'flex';
-        controls.style.gap = '8px';
-
-        const playBtn = document.createElement('button');
-        playBtn.className = 'btn';
-        playBtn.textContent = 'Play';
-        playBtn.onclick = ()=> playTrack(i);
-
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn';
-        delBtn.textContent = 'Remove';
-        delBtn.onclick = ()=> { removeTrack(i); };
-
-        controls.appendChild(playBtn);
-        controls.appendChild(delBtn);
-
-        row.appendChild(info);
-        row.appendChild(controls);
-        playlistEl.appendChild(row);
+        a.appendChild(removeBtn);
+        playlistEl.appendChild(a);
       });
     }
 
@@ -148,8 +135,8 @@
       // no video player — audio player used
       audioPlayer.src = t.url;
       audioPlayer.play().catch(()=>{});
-      // highlight current
-      [...playlistEl.children].forEach((r, i) => r.style.background = i===index ? '#b88640' : 'transparent');
+      // highlight current (use active class)
+      [...playlistEl.querySelectorAll('.side-item')].forEach((r, i) => r.classList.toggle('active', i===index));
     }
 
     function removeTrack(index){

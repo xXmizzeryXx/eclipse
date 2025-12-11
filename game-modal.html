@@ -21,6 +21,10 @@
     .sidebar{width:320px;background:var(--card);border-radius:12px;padding:16px;box-shadow:0 6px 24px rgba(0,0,0,0.4)}
     .sidebar h4{margin:0 0 12px 0;font-size:14px;color:var(--accent);text-transform:uppercase}
     .game-list{display:flex;flex-direction:column;gap:10px;overflow:auto;max-height:calc(100vh - 120px);padding-right:6px}
+    .game-list::-webkit-scrollbar{width:8px}
+    .game-list::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:4px}
+    .game-list::-webkit-scrollbar-thumb{background:var(--accent);border-radius:4px}
+    .game-list::-webkit-scrollbar-thumb:hover{background:#d4a050}
     .side-item{display:flex;flex-direction:column;padding:10px;border-radius:8px;background:rgba(0,0,0,0.05);cursor:pointer;color:#eee;text-decoration:none}
     .side-item.active{background:var(--accent);color:var(--bg)}
     .side-item .name{font-weight:700;font-size:14px}
@@ -28,6 +32,7 @@
     .controls{display:flex;gap:8px;align-items:center}
     .btn{background:transparent;border:2px solid var(--accent);color:var(--accent);padding:6px 10px;border-radius:8px;cursor:pointer}
     .btn.primary{background:var(--accent);color:var(--bg)}
+    .loading{text-align:center;color:var(--muted);padding:20px;font-size:14px}
     @media(max-width:900px){.player-app{flex-direction:column}.sidebar{width:100%;order:2}}
   </style>
 </head>
@@ -53,24 +58,18 @@
 
   <aside class="sidebar" aria-label="Other games list">
     <h4>Other Games</h4>
-    <div class="game-list" id="gameList"></div>
+    <div class="game-list" id="gameList">
+      <div class="loading">Loading games...</div>
+    </div>
   </aside>
 
 </div>
 
 <script>
-  const games = [
-    { name: "Time Shooter 2", category: "action", path: "games/timeshooter2.html", description: "Time moves only when you move." },
-    { name: "Slope", category: "arcade", path: "games/slope.html", description: "Don't let the ball crash." },
-    { name: "Tomb of the Mask", category: "puzzle", path: "games/tomb-of-the-mask.html", description: "Get the yellow guy through the levels." },
-    { name: "Task Force: Eclipse", category: "strategy", path: "games/eclipse.html", description: "Strategic shooter and tactics." },
-    { name: "Retro Bowl", category: "sports", path: "games/retro-bowl/index.html", description: "Football like the 80's." },
-    { name: "Madalin Stunt Cars 3", category: "racing", path: "games/madalin-stunt-cars-3/index.html", description: "Do stunts in a cool car." },
-    { name: "Basket Random", category: "sports", path: "games/basket-random/index.html", description: "Ragdoll basketball fun." }
-  ];
+  let games = [];
 
   const params = new URLSearchParams(location.search);
-  const initialPath = params.get('path') || games[0].path;
+  const initialPath = params.get('path') || '';
   const initialName = params.get('name') || '';
   const initialDescription = params.get('description') || '';
 
@@ -79,6 +78,44 @@
   const frame = document.getElementById('gameFrame');
   const listEl = document.getElementById('gameList');
   const openRawBtn = document.getElementById('openRawBtn');
+
+  // Fetch games from games.html
+  async function loadGames() {
+    try {
+      const response = await fetch('games.html');
+      const html = await response.text();
+      
+      // Extract the games array from the HTML using regex
+      const match = html.match(/const games = \[([\s\S]*?)\];/);
+      if (match) {
+        // Parse the games array
+        const gamesStr = '[' + match[1] + ']';
+        // Use eval carefully here (only on our own trusted content)
+        games = eval(gamesStr);
+        buildList();
+        
+        // Set initial game
+        const firstGame = games[0] || {};
+        setGame(
+          initialPath || firstGame.path || 'about:blank', 
+          initialName || firstGame.name || 'Play', 
+          initialDescription || firstGame.description || '',
+          false
+        );
+      } else {
+        console.error('Could not find games array in games.html');
+        listEl.innerHTML = '<div class="loading">Error loading games</div>';
+      }
+    } catch (error) {
+      console.error('Error loading games:', error);
+      listEl.innerHTML = '<div class="loading">Error loading games</div>';
+      
+      // Fallback to initial game if provided
+      if (initialPath) {
+        setGame(initialPath, initialName, initialDescription, false);
+      }
+    }
+  }
 
   function setGame(path, name, description, push=true){
     titleEl.textContent = name || decodeURIComponent(path.split('/').pop());
@@ -113,10 +150,8 @@
 
   document.getElementById('backBtn').addEventListener('click', ()=>{ location.href = 'games.html'; });
 
-  buildList();
-
-  
-  setGame(initialPath, initialName || (games.find(g=>g.path===initialPath)||{}).name || 'Play', initialDescription || (games.find(g=>g.path===initialPath)||{}).description || '');
+  // Load games on page load
+  loadGames();
 
 </script>
 </body>

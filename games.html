@@ -9,146 +9,113 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <link rel="stylesheet" href="assets/css/styles.css" />
 <style>
-  .games-header {
-    margin-bottom: 32px;
-  }
+  .games-header { margin-bottom: 32px; }
+  .games-title { font-family: 'Montserrat', sans-serif; font-size: 42px; font-weight: 700; color: #eee; margin: 0 0 12px 0; }
+  .games-subtitle { font-size: 18px; color: #bdb1a0; margin: 0 0 24px 0; }
+  .search-games { display: flex; gap: 12px; max-width: 640px; width: 100%; margin-bottom: 32px; }
+  .search-games input { flex-grow: 1; padding: 14px 18px; border-radius: 8px; border: none; font-size: 16px; font-family: inherit; background: #1e160b; color: #eee; outline-offset: 2px; outline-color: #b88640; }
+  .search-games input::placeholder { color: #b3a177cc; }
+  .category-filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; }
+  .filter-btn { background: #1e160b; border: 2px solid #b88640; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-family: inherit; cursor: pointer; color: #eee; transition: all 0.3s ease; }
+  .filter-btn:hover, .filter-btn.active { background-color: #b88640; color: #0f0e0e; }
+  .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+  .game-card { background: #1e160b; border-radius: 12px; padding: 0; overflow: hidden; box-shadow: 0 0 20px rgba(184,134,72,0.15); transition: transform 0.3s ease, box-shadow 0.3s ease; cursor: pointer; text-decoration: none; color: inherit; display: flex; flex-direction: column; position: relative; }
+  .game-card:hover { transform: translateY(-5px); box-shadow: 0 0 30px rgba(184,134,72,0.3); }
+  .game-info { padding: 20px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+  .game-title { font-weight: 700; font-size: 18px; color: #eee; margin: 0; }
+  .game-category { font-size: 12px; color: #b88640; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
+  .no-results { text-align: center; padding: 60px 20px; color: #bdb1a0; font-size: 18px; }
+  .loading { text-align: center; padding: 60px 20px; color: #b88640; font-size: 18px; }
+  html, body { overflow-y: auto; height: auto; }
+  .content { overflow-y: auto; max-height: none; }
 
-  .games-title {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 42px;
-    font-weight: 700;
-    color: #eee;
-    margin: 0 0 12px 0;
+  /* ── ZENOPACK ── */
+  .zp-export-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(184,134,72,0.12); border: 1px solid rgba(184,134,72,0.3);
+    border-radius: 5px; color: #b88640; font-size: 11px;
+    padding: 4px 9px; cursor: pointer; opacity: 0;
+    transition: all 0.2s; z-index: 2; white-space: nowrap;
+    font-family: inherit; font-weight: 600;
   }
+  .game-card:hover .zp-export-btn { opacity: 1; }
+  .zp-export-btn:hover { background: #b88640; color: #0f0e0e; }
 
-  .games-subtitle {
-    font-size: 18px;
-    color: #bdb1a0;
-    margin: 0 0 24px 0;
+  .zp-import-btn {
+    background: #1e160b; border: 2px solid #b88640;
+    padding: 10px 20px; border-radius: 8px;
+    font-weight: 600; font-family: inherit; cursor: pointer;
+    color: #b88640; transition: all 0.3s ease;
+    display: flex; align-items: center; gap: 8px; font-size: 14px;
   }
+  .zp-import-btn:hover { background: #b88640; color: #0f0e0e; }
 
-  .search-games {
-    display: flex;
-    gap: 12px;
-    max-width: 640px;
-    width: 100%;
-    margin-bottom: 32px;
+  .zp-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    z-index: 1000; align-items: center; justify-content: center;
   }
+  .zp-modal-overlay.open { display: flex; }
+  .zp-modal {
+    background: #1a120a; border: 2px solid #b88640;
+    border-radius: 14px; padding: 32px 36px 28px;
+    width: 460px; max-width: 94vw; text-align: center;
+    box-shadow: 0 0 60px rgba(184,134,72,0.12);
+  }
+  .zp-modal-title { font-family: 'Montserrat', sans-serif; font-size: 20px; color: #eee; margin-bottom: 6px; }
+  .zp-modal-sub { font-size: 13px; color: #bdb1a0; margin-bottom: 24px; }
+  .zp-drop {
+    border: 2px dashed rgba(184,134,72,0.3); border-radius: 10px;
+    padding: 36px 20px; cursor: pointer; transition: all 0.25s;
+    background: rgba(184,134,72,0.02); position: relative; margin-bottom: 14px;
+  }
+  .zp-drop:hover, .zp-drop.over { border-color: #b88640; background: rgba(184,134,72,0.06); }
+  .zp-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .zp-drop-icon { font-size: 2rem; color: #b88640; margin-bottom: 10px; }
+  .zp-drop-text { font-size: 14px; color: #bdb1a0; }
+  .zp-drop-text em { color: #b88640; font-style: normal; }
+  .zp-progress { height: 3px; background: rgba(184,134,72,0.12); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+  .zp-progress-bar { height: 100%; background: #b88640; border-radius: 3px; transition: width 0.2s; width: 0%; }
+  .zp-status { font-size: 13px; min-height: 18px; margin-bottom: 18px; transition: color 0.2s; color: #bdb1a0; }
+  .zp-status.ok  { color: #7dc97d; }
+  .zp-status.err { color: #e05555; }
+  .zp-status.info{ color: #b88640; }
+  .zp-close-btn { background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; padding: 9px 22px; cursor: pointer; color: #bdb1a0; font-family: inherit; font-size: 13px; transition: all 0.2s; }
+  .zp-close-btn:hover { color: #eee; border-color: rgba(255,255,255,0.25); }
 
-  .search-games input {
-    flex-grow: 1;
-    padding: 14px 18px;
-    border-radius: 8px;
-    border: none;
-    font-size: 16px;
-    font-family: inherit;
-    background: #1e160b;
-    color: #eee;
-    outline-offset: 2px;
-    outline-color: #b88640;
+  .zp-toast {
+    position: fixed; bottom: 60px; left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: #1a120a; border: 1px solid #b88640;
+    border-radius: 8px; padding: 10px 22px;
+    color: #b88640; font-size: 13px; font-weight: 600;
+    z-index: 9999; transition: transform 0.3s cubic-bezier(.34,1.56,.64,1); white-space: nowrap;
   }
+  .zp-toast.show { transform: translateX(-50%) translateY(0); }
+  .zp-toast.ok  { border-color: #7dc97d; color: #7dc97d; }
+  .zp-toast.err { border-color: #e05555; color: #e05555; }
 
-  .search-games input::placeholder {
-    color: #b3a177cc;
+  /* Inline game player for imported zenopack games */
+  .zp-player-overlay {
+    display: none; position: fixed; inset: 0; z-index: 2000;
+    background: #000; flex-direction: column;
   }
-
-  .category-filters {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 32px;
+  .zp-player-overlay.open { display: flex; }
+  .zp-player-bar {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 16px; height: 44px; flex-shrink: 0;
+    background: #1a120a; border-bottom: 1px solid rgba(184,134,72,0.2);
   }
-
-  .filter-btn {
-    background: #1e160b;
-    border: 2px solid #b88640;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    color: #eee;
-    transition: all 0.3s ease;
+  .zp-player-back {
+    display: flex; align-items: center; gap: 7px;
+    font-family: inherit; font-size: 13px; font-weight: 600;
+    color: #bdb1a0; border: 1px solid rgba(184,134,72,0.25);
+    border-radius: 6px; padding: 6px 14px; cursor: pointer;
+    background: transparent; transition: all 0.2s;
   }
-
-  .filter-btn:hover, .filter-btn.active {
-    background-color: #b88640;
-    color: #0f0e0e;
-  }
-
-  .games-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-    margin-bottom: 40px;
-  }
-
-  .game-card {
-    background: #1e160b;
-    border-radius: 12px;
-    padding: 0;
-    overflow: hidden;
-    box-shadow: 0 0 20px rgba(184,134,72,0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .game-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0 30px rgba(184,134,72,0.3);
-  }
-
-  .game-info {
-    padding: 20px;
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .game-title {
-    font-weight: 700;
-    font-size: 18px;
-    color: #eee;
-    margin: 0;
-  }
-
-  .game-category {
-    font-size: 12px;
-    color: #b88640;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 8px;
-  }
-
-  .no-results {
-    text-align: center;
-    padding: 60px 20px;
-    color: #bdb1a0;
-    font-size: 18px;
-  }
-
-  .loading {
-    text-align: center;
-    padding: 60px 20px;
-    color: #b88640;
-    font-size: 18px;
-  }
-
-  html, body {
-    overflow-y: auto;
-    height: auto;
-  }
-
-  .content {
-    overflow-y: auto;
-    max-height: none;
-  }
+  .zp-player-back:hover { color: #b88640; border-color: #b88640; }
+  .zp-player-title { font-family: 'Montserrat', sans-serif; font-size: 14px; color: #eee; }
+  .zp-player-frame { flex: 1; width: 100%; border: none; background: #000; }
 </style>
 </head>
 <body>
@@ -157,8 +124,35 @@
   <source src="assets/bg/background.mp4" type="video/mp4">
 </video>
 
+<!-- ZENOPACK IMPORT MODAL -->
+<div class="zp-modal-overlay" id="zpModal">
+  <div class="zp-modal">
+    <div class="zp-modal-title">&#128230; Import ZenoPack</div>
+    <div class="zp-modal-sub">Load a game from a .zenopack file</div>
+    <div class="zp-drop" id="zpDrop">
+      <input type="file" id="zpFileInput" accept=".zenopack">
+      <div class="zp-drop-icon">&#128230;</div>
+      <div class="zp-drop-text">Drop a <em>.zenopack</em> here or click to browse</div>
+    </div>
+    <div class="zp-progress"><div class="zp-progress-bar" id="zpProgressBar"></div></div>
+    <div class="zp-status" id="zpStatus"></div>
+    <button class="zp-close-btn" onclick="closeZpModal()">Cancel</button>
+  </div>
+</div>
+
+<div class="zp-toast" id="zpToast"></div>
+
+<!-- INLINE ZENOPACK GAME PLAYER -->
+<div class="zp-player-overlay" id="zpPlayerOverlay">
+  <div class="zp-player-bar">
+    <button class="zp-player-back" onclick="closeZpPlayer()"><i class="fa-solid fa-chevron-left"></i> Back</button>
+    <div class="zp-player-title" id="zpPlayerTitle"></div>
+  </div>
+  <iframe class="zp-player-frame" id="zpPlayerFrame" src="" allowfullscreen allow="autoplay; fullscreen"></iframe>
+</div>
+
 <div class="app">
-  
+
   <nav class="sidebar" aria-label="Main sidebar navigation">
     <div class="icon" title="Home" onclick="window.location.href='index.html'"><i class="fa-solid fa-house"></i></div>
     <div class="icon" title="Browser" onclick="window.location.href='frame.html'"><i class="fa-solid fa-globe"></i></div>
@@ -171,11 +165,9 @@
   </nav>
 
   <main class="content" role="main">
-    
+
     <div class="games-header">
-      <h1 class="games-title">
-        games<span style="color: #b88640;">.</span>
-      </h1>
+      <h1 class="games-title">games<span style="color: #b88640;">.</span></h1>
       <p class="games-subtitle">Browse and play popular unblocked games</p>
     </div>
 
@@ -191,16 +183,12 @@
       <button class="filter-btn" data-category="strategy">Strategy</button>
       <button class="filter-btn" data-category="sports">Sports</button>
       <button class="filter-btn" data-category="arcade">Arcade</button>
+      <button class="zp-import-btn" onclick="openZpModal()"><i class="fa-solid fa-box-open"></i> Import .zenopack</button>
     </div>
 
     <div class="loading" id="loading">Loading games...</div>
-
-    <div class="games-grid" id="gamesGrid" style="display: none;">
-    </div>
-
-    <div class="no-results" id="noResults" style="display: none;">
-      No games found. Try a different search or category.
-    </div>
+    <div class="games-grid" id="gamesGrid" style="display: none;"></div>
+    <div class="no-results" id="noResults" style="display: none;">No games found. Try a different search or category.</div>
 
   </main>
 </div>
@@ -214,7 +202,81 @@
 </footer>
 
 <script>
-  const games = [
+// ── ZENOPACK CONSTANTS ────────────────────────────────────────────
+const ZENOPACK_VERSION = '1.0';
+const GAME_BASE_URL = '/games';
+
+// ── SERVICE WORKER ────────────────────────────────────────────────
+let swReg = null;
+let swReady = false;
+
+async function initSW() {
+  if (!('serviceWorker' in navigator)) {
+    console.warn('ZenoPack SW: not supported');
+    return false;
+  }
+  try {
+    swReg = await navigator.serviceWorker.register('/zenopack-sw.js', { scope: '/' });
+    await navigator.serviceWorker.ready;
+    swReady = true;
+    return true;
+  } catch(e) {
+    console.error('ZenoPack SW registration failed:', e);
+    return false;
+  }
+}
+
+function getSW() {
+  return navigator.serviceWorker?.controller || swReg?.active || null;
+}
+
+function postSW(msg, transfers = []) {
+  return new Promise((resolve, reject) => {
+    const sw = getSW();
+    if (!sw) return reject(new Error('No SW'));
+    const mc = new MessageChannel();
+    mc.port1.onmessage = e => resolve(e.data);
+    sw.postMessage(msg, [mc.port2, ...transfers]);
+    setTimeout(() => reject(new Error('SW timeout')), 8000);
+  });
+}
+
+async function pingGame(gameId) {
+  try {
+    const res = await postSW({ type: 'PING_GAME', gameId });
+    return res.type === 'GAME_FOUND';
+  } catch(e) { return false; }
+}
+
+async function registerGameWithSW(gameId, fileRecords) {
+  if (!swReady) await initSW();
+  const sw = getSW();
+  if (!sw) return false;
+  try {
+    const filesMeta = fileRecords.map(r => ({ path: r.path, mimeType: r.mimeType }));
+    const buffers = await Promise.all(fileRecords.map(r => r.file.arrayBuffer()));
+    const clones = buffers.map(b => b.slice(0));
+    const res = await postSW({ type: 'REGISTER_GAME', gameId, filesMeta, buffers: clones }, clones);
+    return res.type === 'GAME_REGISTERED';
+  } catch(e) {
+    console.error('SW register failed:', e);
+    return false;
+  }
+}
+
+// Init SW on page load
+initSW();
+const MIME_MAP = {
+  html:'text/html',htm:'text/html',js:'application/javascript',mjs:'application/javascript',
+  css:'text/css',json:'application/json',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',
+  gif:'image/gif',webp:'image/webp',svg:'image/svg+xml',bmp:'image/bmp',ico:'image/x-icon',
+  mp3:'audio/mpeg',ogg:'audio/ogg',wav:'audio/wav',mp4:'video/mp4',webm:'video/webm',
+  woff:'font/woff',woff2:'font/woff2',ttf:'font/ttf',txt:'text/plain',wasm:'application/wasm',
+};
+const getMime = n => MIME_MAP[n.split('.').pop().toLowerCase()] || 'application/octet-stream';
+
+// ── GAME LIST ─────────────────────────────────────────────────────
+const builtInGames = [
     { name: "10 Minutes Till Dawn", folder: "10-minutes-till-dawn" },
     { name: "2048 Multitask", folder: "2048-multitask" },
     { name: "2048", folder: "2048" },
@@ -288,90 +350,365 @@
     { name: "Volley Random", folder: "volley-random" },
     { name: "Worlds Hardest Game 2", folder: "worlds-hardest-game-2" },
     { name: "Worlds Hardest Game", folder: "worlds-hardest-game" }
-  ].map(game => {
-    const nameLower = game.name.toLowerCase();
-    let category = 'arcade';
-    
-    if (nameLower.includes('drift') || nameLower.includes('car') || nameLower.includes('moto') || nameLower.includes('drive')) {
-      category = 'racing';
-    } else if (nameLower.includes('2048') || nameLower.includes('puzzle')) {
-      category = 'puzzle';
-    } else if (nameLower.includes('shooter') || nameLower.includes('die') || nameLower.includes('rush') || nameLower.includes('kill') || nameLower.includes('combat') || nameLower.includes('sniper')) {
-      category = 'action';
-    } else if (nameLower.includes('random') || nameLower.includes('basket') || nameLower.includes('soccer') || nameLower.includes('volley') || nameLower.includes('boxing') || nameLower.includes('bowl')) {
-      category = 'sports';
-    } else if (nameLower.includes('strategy') || nameLower.includes('conflict') || nameLower.includes('ages')) {
-      category = 'strategy';
-    }
-    
-    return { ...game, category };
+].map(game => {
+  const n = game.name.toLowerCase();
+  let category = 'arcade';
+  if (n.includes('drift') || n.includes('car') || n.includes('moto') || n.includes('drive')) category = 'racing';
+  else if (n.includes('2048') || n.includes('puzzle')) category = 'puzzle';
+  else if (n.includes('shooter') || n.includes('die') || n.includes('rush') || n.includes('kill') || n.includes('combat') || n.includes('sniper')) category = 'action';
+  else if (n.includes('random') || n.includes('basket') || n.includes('soccer') || n.includes('volley') || n.includes('boxing') || n.includes('bowl')) category = 'sports';
+  else if (n.includes('strategy') || n.includes('conflict') || n.includes('ages')) category = 'strategy';
+  return { ...game, category };
+});
+
+// Imported zenopack games — stored in IndexedDB (no size limit)
+let importedGames = [];
+
+const ZP_DB_NAME = 'eclipse-zenopack';
+const ZP_DB_VERSION = 1;
+let zpDb = null;
+
+function openZpDB() {
+  return new Promise((resolve, reject) => {
+    if (zpDb) return resolve(zpDb);
+    const req = indexedDB.open(ZP_DB_NAME, ZP_DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('games')) db.createObjectStore('games', { keyPath: 'gameId' });
+      if (!db.objectStoreNames.contains('files')) {
+        const fs = db.createObjectStore('files', { keyPath: 'id' });
+        fs.createIndex('gameId', 'gameId');
+      }
+    };
+    req.onsuccess = e => { zpDb = e.target.result; resolve(zpDb); };
+    req.onerror = () => reject(req.error);
   });
+}
 
-  let currentCategory = 'all';
-  let searchQuery = '';
-
-  function renderGames() {
-    const grid = document.getElementById('gamesGrid');
-    const noResults = document.getElementById('noResults');
-    const loading = document.getElementById('loading');
-    
-    let filtered = games.filter(game => {
-      const matchesCategory = currentCategory === 'all' || game.category === currentCategory;
-      const searchLower = searchQuery.toLowerCase();
-      const matchesSearch = searchQuery === '' || game.name.toLowerCase().includes(searchLower);
-      return matchesCategory && matchesSearch;
-    });
-
-    loading.style.display = 'none';
-
-    if (filtered.length === 0) {
-      grid.style.display = 'none';
-      noResults.style.display = 'block';
-    } else {
-      grid.style.display = 'grid';
-      noResults.style.display = 'none';
-      
-      grid.innerHTML = filtered.map(game => `
-        <a href="game-modal.html?game=${encodeURIComponent(game.folder)}" class="game-card">
-          <div class="game-info">
-            <h3 class="game-title">${game.name}</h3>
-            <div class="game-category">${game.category}</div>
-          </div>
-        </a>
-      `).join('');
-    }
-
-    document.getElementById('gameCount').textContent = filtered.length;
-  }
-
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      this.classList.add('active');
-      currentCategory = this.getAttribute('data-category');
-      renderGames();
-    });
+async function saveGameToDB(entry) {
+  const db = await openZpDB();
+  // Read all file buffers BEFORE opening transaction
+  const filesToStore = entry.fileRecords.map((f, i) => ({
+    id: entry.gameId + '_' + i,
+    gameId: entry.gameId,
+    path: f.path,
+    mimeType: f.mimeType,
+    data: f.data,
+  }));
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(['games','files'], 'readwrite');
+    tx.objectStore('games').put({ gameId: entry.gameId, name: entry.name, category: entry.category, entryUrl: entry.entryUrl });
+    filesToStore.forEach(f => tx.objectStore('files').put(f));
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
   });
+}
 
-  document.getElementById('gameSearch').addEventListener('input', function(e) {
-    searchQuery = e.target.value;
-    renderGames();
+async function loadGamesFromDB() {
+  const db = await openZpDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('games', 'readonly');
+    const req = tx.objectStore('games').getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
   });
+}
 
-  const cloakPresets = [
-    { title: "Google", favicon: "https://www.google.com/favicon.ico" },
-    { title: "Google Docs", favicon: "https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" },
-    { title: "Google Classroom", favicon: "https://ssl.gstatic.com/classroom/favicon.png" },
-    { title: "Canvas", favicon: "https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico" }
+async function loadFilesFromDB(gameId) {
+  const db = await openZpDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('files', 'readonly');
+    const idx = tx.objectStore('files').index('gameId');
+    const req = idx.getAll(gameId);
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function deleteGameFromDB(gameId) {
+  const db = await openZpDB();
+  const files = await loadFilesFromDB(gameId);
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(['games','files'], 'readwrite');
+    tx.objectStore('games').delete(gameId);
+    files.forEach(f => tx.objectStore('files').delete(f.id));
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+let currentCategory = 'all';
+let searchQuery = '';
+
+// ── ZENOPACK PLAYER ──────────────────────────────────────────────
+function openZpPlayer(url, name) {
+  document.getElementById('zpPlayerTitle').textContent = name;
+  document.getElementById('zpPlayerFrame').src = url;
+  document.getElementById('zpPlayerOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeZpPlayer() {
+  document.getElementById('zpPlayerOverlay').classList.remove('open');
+  document.getElementById('zpPlayerFrame').src = '';
+  document.body.style.overflow = '';
+}
+
+// ── RENDER ────────────────────────────────────────────────────────
+function renderGames() {
+  const grid = document.getElementById('gamesGrid');
+  const noResults = document.getElementById('noResults');
+  const loading = document.getElementById('loading');
+
+  const allGames = [
+    ...builtInGames,
+    ...importedGames.map(g => ({ ...g, imported: true }))
   ];
 
-  document.getElementById('emergencyCloakBtn').addEventListener('click', () => {
-    const randomPreset = cloakPresets[Math.floor(Math.random() * cloakPresets.length)];
-    document.title = randomPreset.title;
-    document.querySelector('link[rel="icon"]').href = randomPreset.favicon;
+  const filtered = allGames.filter(game => {
+    const matchesCategory = currentCategory === 'all' || game.category === currentCategory;
+    const matchesSearch = searchQuery === '' || game.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
   });
 
+  loading.style.display = 'none';
+
+  if (filtered.length === 0) {
+    grid.style.display = 'none';
+    noResults.style.display = 'block';
+  } else {
+    grid.style.display = 'grid';
+    noResults.style.display = 'none';
+    grid.innerHTML = filtered.map(game => {
+      const href = game.imported
+        ? '#'
+        : `game-modal.html?game=${encodeURIComponent(game.folder)}`;
+      const onClickAttr = game.imported
+        ? `onclick="event.preventDefault();openZpPlayer('${game.entryUrl.replace(/'/g,"\'")}','${game.name.replace(/'/g,"\'")}')"`
+        : '';
+      const exportBtn = !game.imported
+        ? `<button class="zp-export-btn" onclick="event.preventDefault();event.stopPropagation();exportGame('${game.folder}','${game.name.replace(/'/g,"\\'")}','${game.category}')" title="Export as .zenopack"><i class="fa-solid fa-box-archive"></i> .zenopack</button>`
+        : `<button class="zp-export-btn" onclick="event.preventDefault();event.stopPropagation();removeImported('${game.name.replace(/'/g,"\\'")}')"><i class="fa-solid fa-xmark"></i> remove</button>`;
+      return `
+        <a href="${href}" class="game-card" ${onClickAttr}>
+          ${exportBtn}
+          <div class="game-info">
+            <h3 class="game-title">${game.name}</h3>
+            <div class="game-category">${game.imported ? '&#128230; ' : ''}${game.category}</div>
+          </div>
+        </a>`;
+    }).join('');
+  }
+
+  document.getElementById('gameCount').textContent = filtered.length;
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────
+async function exportGame(folder, name, category) {
+  showZpToast('Packaging game...', '');
+  try {
+    const baseUrl = GAME_BASE_URL + '/' + folder + '/';
+    const indexRes = await fetch(baseUrl + 'index.html');
+    if (!indexRes.ok) throw new Error('Could not read game files — make sure the game folder exists in /games/');
+    const indexHtml = await indexRes.text();
+
+    const assetPaths = extractAssetPaths(indexHtml);
+    const allPaths = ['index.html', ...assetPaths];
+    const files = [];
+
+    for (const path of allPaths) {
+      try {
+        const res = await fetch(baseUrl + path);
+        if (!res.ok) continue;
+        const buf = await res.arrayBuffer();
+        files.push({ path, mimeType: getMime(path.split('/').pop()), data: Array.from(new Uint8Array(buf)) });
+      } catch(e) { /* skip */ }
+    }
+
+    if (!files.length) throw new Error('No files downloaded');
+
+    const pack = { zenopack: ZENOPACK_VERSION, name, category, fileCount: files.length, exportedAt: new Date().toISOString(), files };
+    const blob = new Blob([JSON.stringify(pack)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = folder + '.zenopack';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    showZpToast(name + ' exported!', 'ok');
+  } catch(e) {
+    showZpToast('Export failed: ' + e.message, 'err');
+  }
+}
+
+function extractAssetPaths(html) {
+  const assets = new Set();
+  const patterns = [/src=["']([^"']+)["']/gi, /href=["']([^"']+)["']/gi];
+  for (const re of patterns) {
+    let m;
+    while ((m = re.exec(html)) !== null) {
+      const raw = m[1].trim();
+      if (!raw || raw.startsWith('http') || raw.startsWith('//') || raw.startsWith('data:') || raw.startsWith('#') || raw.startsWith('mailto:')) continue;
+      assets.add(raw.replace(/^\.\//, ''));
+    }
+  }
+  return [...assets];
+}
+
+// ── IMPORT ────────────────────────────────────────────────────────
+function openZpModal() {
+  document.getElementById('zpModal').classList.add('open');
+  setZpStatus('', '');
+  document.getElementById('zpProgressBar').style.width = '0%';
+  document.getElementById('zpFileInput').value = '';
+}
+function closeZpModal() {
+  document.getElementById('zpModal').classList.remove('open');
+  document.getElementById('zpFileInput').value = '';
+}
+function setZpStatus(msg, cls) {
+  const el = document.getElementById('zpStatus');
+  el.textContent = msg;
+  el.className = 'zp-status' + (cls ? ' ' + cls : '');
+}
+
+async function handleZpImport(file) {
+  if (!file || !file.name.endsWith('.zenopack')) { setZpStatus('Must be a .zenopack file', 'err'); return; }
+  setZpStatus('Reading file...', 'info');
+  document.getElementById('zpProgressBar').style.width = '25%';
+
+  try {
+    const text = await file.text();
+    const pack = JSON.parse(text);
+    if (!pack.zenopack || !Array.isArray(pack.files) || !pack.files.length) throw new Error('Invalid .zenopack file');
+    const indexFile = pack.files.find(f => f.path.toLowerCase() === 'index.html');
+    if (!indexFile) throw new Error('Missing index.html in pack');
+
+    document.getElementById('zpProgressBar').style.width = '65%';
+    setZpStatus('Loading game...', 'info');
+
+    // Build fileRecords for SW registration
+    const fileRecords = pack.files.map(f => {
+      const fileObj = new File([new Uint8Array(f.data)], f.path.split('/').pop(), { type: f.mimeType });
+      return { file: fileObj, path: f.path, mimeType: f.mimeType };
+    });
+
+    document.getElementById('zpProgressBar').style.width = '50%';
+    setZpStatus('Registering with service worker...', 'info');
+
+    // Generate a unique game ID
+    const gameId = 'zp' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+
+    if (!swReady) await initSW();
+    const ok = await registerGameWithSW(gameId, fileRecords);
+    if (!ok) throw new Error('Service worker registration failed — try refreshing the page');
+
+    const entryUrl = `/zenopack-games/${gameId}/index.html`;
+
+    // Save to IndexedDB
+    const entry = {
+      name: pack.name,
+      category: pack.category || 'arcade',
+      gameId,
+      entryUrl,
+      fileRecords: pack.files.map(f => ({ path: f.path, mimeType: f.mimeType, data: f.data }))
+    };
+    await saveGameToDB(entry);
+    importedGames.push({ name: entry.name, category: entry.category, gameId, entryUrl });
+
+    document.getElementById('zpProgressBar').style.width = '100%';
+    setZpStatus('Game imported!', 'ok');
+    renderGames();
+    setTimeout(() => { closeZpModal(); showZpToast(pack.name + ' added!', 'ok'); }, 700);
+  } catch(e) {
+    setZpStatus('Failed: ' + e.message, 'err');
+    document.getElementById('zpProgressBar').style.width = '0%';
+  }
+  document.getElementById('zpFileInput').value = '';
+}
+
+async function removeImported(name) {
+  if (!confirm('Remove "' + name + '" from your library?')) return;
+  const game = importedGames.find(g => g.name === name);
+  if (game?.gameId) await deleteGameFromDB(game.gameId).catch(console.error);
+  importedGames = importedGames.filter(g => g.name !== name);
   renderGames();
+  showZpToast(name + ' removed', '');
+}
+
+document.getElementById('zpFileInput').addEventListener('change', e => handleZpImport(e.target.files[0]));
+
+const zpDrop = document.getElementById('zpDrop');
+zpDrop.addEventListener('dragover', e => { e.preventDefault(); zpDrop.classList.add('over'); });
+zpDrop.addEventListener('dragleave', () => zpDrop.classList.remove('over'));
+zpDrop.addEventListener('drop', e => {
+  e.preventDefault(); zpDrop.classList.remove('over');
+  handleZpImport(e.dataTransfer.files[0]);
+});
+document.getElementById('zpModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('zpModal')) closeZpModal();
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────
+let zpToastTimer;
+function showZpToast(msg, type) {
+  const t = document.getElementById('zpToast');
+  t.textContent = msg; t.className = 'zp-toast' + (type ? ' ' + type : '');
+  void t.offsetWidth; t.classList.add('show');
+  clearTimeout(zpToastTimer);
+  zpToastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── FILTERS & SEARCH ──────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentCategory = this.getAttribute('data-category');
+    renderGames();
+  });
+});
+
+document.getElementById('gameSearch').addEventListener('input', function(e) {
+  searchQuery = e.target.value;
+  renderGames();
+});
+
+// ── CLOAK ─────────────────────────────────────────────────────────
+const cloakPresets = [
+  { title: "Google", favicon: "https://www.google.com/favicon.ico" },
+  { title: "Google Docs", favicon: "https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" },
+  { title: "Google Classroom", favicon: "https://ssl.gstatic.com/classroom/favicon.png" },
+  { title: "Canvas", favicon: "https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico" }
+];
+document.getElementById('emergencyCloakBtn').addEventListener('click', () => {
+  const p = cloakPresets[Math.floor(Math.random() * cloakPresets.length)];
+  document.title = p.title;
+  document.querySelector('link[rel="icon"]').href = p.favicon;
+});
+
+renderGames();
+
+// Load games from IDB and re-register with SW on page load
+(async function reRegisterGames() {
+  try {
+    const saved = await loadGamesFromDB();
+    if (!saved.length) return;
+    await initSW();
+    for (const g of saved) {
+      importedGames.push({ name: g.name, category: g.category, gameId: g.gameId, entryUrl: g.entryUrl });
+      const found = await pingGame(g.gameId);
+      if (!found) {
+        const dbFiles = await loadFilesFromDB(g.gameId);
+        if (!dbFiles.length) continue;
+        const fileRecords = dbFiles.map(f => {
+          const fileObj = new File([new Uint8Array(f.data)], f.path.split('/').pop(), { type: f.mimeType });
+          return { file: fileObj, path: f.path, mimeType: f.mimeType };
+        });
+        await registerGameWithSW(g.gameId, fileRecords);
+      }
+    }
+    renderGames();
+  } catch(e) { console.error('ZenoPack restore failed:', e); }
+})();
 </script>
 </body>
 </html>
